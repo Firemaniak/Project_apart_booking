@@ -1,5 +1,5 @@
 from django.conf import settings
-from tkinter.constants import CASCADE
+
 
 from django.db import models
 
@@ -22,7 +22,7 @@ class ListingStatistic(UniqueID, TimeStampedModel):
     total_revenue = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     average_rating = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
     reviews_count = models.PositiveIntegerField(default=0)
-    listing = models.OneToOneField(Listing, on_delete=CASCADE, related_name='statistic')
+    listing = models.OneToOneField(Listing, on_delete=models.CASCADE, related_name='statistic')
 
 
 
@@ -44,7 +44,7 @@ class UserStatistic(UniqueID, TimeStampedModel):
     stars_count = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
     total_earned = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total_spent = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=CASCADE, related_name='statistic')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='statistic')
 
 
     class Meta:

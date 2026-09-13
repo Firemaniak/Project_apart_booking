@@ -1,9 +1,7 @@
-#from django.contrib.auth.models import User
 from django.db import models
 
-from django.db.models.fields import CharField, DecimalField
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, MinLengthValidator, MaxLengthValidator
 from django.conf import settings
 
 from apps.core.models import UniqueID, TimeStampedModel
@@ -23,23 +21,23 @@ class InputTypeChoices(models.TextChoices):
 
 
 class Listing(UniqueID, TimeStampedModel):
-    apartment_name = models.CharField(validators=[MinLengthValidator(3),MaxLengthValidator(30)],
+    apartment_name = models.CharField(max_length=30, validators=[MinLengthValidator(3),MaxLengthValidator(30)],
                                   verbose_name='apartment name')
     description = models.TextField(blank=True,
                                    verbose_name='description')
-    address = models.CharField(validators=[MinLengthValidator(5),MaxLengthValidator(40)],
+    address = models.CharField(max_length=60, validators=[MinLengthValidator(5)],
                                  verbose_name='address')
-    floor = models.PositiveIntegerField(validators=[MinLengthValidator(1),MaxLengthValidator(165)],
+    floor = models.PositiveIntegerField(validators=[MinValueValidator(1),MaxValueValidator(165)],
                                  verbose_name='floor')    #Бурдж-Халифа в Дубае, ОАЭ имеет 163 этажа
-    country = models.CharField(validators=[MinLengthValidator(2),MaxLengthValidator(20)],
+    country = models.CharField(max_length=30, validators=[MinLengthValidator(2)],
                                  verbose_name='country')
-    room_count = models.PositiveIntegerField(validators=[MinLengthValidator(1),MaxLengthValidator(20)],
+    room_count = models.PositiveIntegerField(validators=[MinValueValidator(1),MaxValueValidator(20)],
                                  verbose_name='number of rooms')
-    shower_count = models.PositiveIntegerField(validators=[MinLengthValidator(1), MaxLengthValidator(20)],
+    shower_count = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)],
                                   verbose_name='number of shower rooms')
-    toilets_count = models.PositiveIntegerField(validators=[MinLengthValidator(1), MaxLengthValidator(20)],
+    toilets_count = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)],
                                     verbose_name='number of toilets')
-    input_type = models.CharField(choices=InputTypeChoices, default=InputTypeChoices.with_key,
+    input_type = models.CharField(max_length=10, choices=InputTypeChoices, default=InputTypeChoices.with_key,
                                   verbose_name='how to get in')
     parking = models.BooleanField(default=False,
                                   verbose_name='availability of parking')

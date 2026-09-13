@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.core.models import UniqueID, TimeStampedModel
 from apps.bookings.models import Booking
 
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, MinLengthValidator, MaxLengthValidator
 
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -31,7 +31,7 @@ class Review(UniqueID, TimeStampedModel):
                                           related_name='review')
     stars = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
-        verbose_name='stars'
+        verbose_name='stars')
     owner_response = models.TextField(blank=True)
     owner_response_at = models.DateTimeField(blank=True, null=True)
 
@@ -49,6 +49,7 @@ class Review(UniqueID, TimeStampedModel):
 
     #проверка что комент можно оставить только после окончания брони
     def clean(self):
+        super().clean()
         if self.booking.end_date > timezone.localtime(timezone.now()):
             raise ValidationError('Оставить отзыв можно только после завершения бронирования.')
 

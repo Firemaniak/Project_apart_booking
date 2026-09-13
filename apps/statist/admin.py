@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import ListingStatistic, UserStatistic
 
-# Register your models here.
+admin.site.register(ListingStatistic)
+admin.site.register(UserStatistic)

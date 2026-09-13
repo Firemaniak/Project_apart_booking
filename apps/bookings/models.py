@@ -34,20 +34,47 @@ class Booking(TimeStampedModel, UniqueID):
     end_date = models.DateTimeField()
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)],
                                 verbose_name='price')
-    payment_type = models.CharField(choices=PayTypeChoices, default=PayTypeChoices.bank_cart,
+    payment_type = models.CharField(max_length=10,
+                                    choices=PayTypeChoices, default=PayTypeChoices.bank_cart,
                                   verbose_name='payment type')
-    prepayment_type = models.CharField(choices=PrepaymentTypeChoices, default=PrepaymentTypeChoices.partial_prepayment,
+    prepayment_type = models.CharField(max_length=20,
+                                       choices=PrepaymentTypeChoices, default=PrepaymentTypeChoices.partial_prepayment,
                                   verbose_name='prepayment type')
     guest = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='bookings')  ####ForeignKey HIERRRR---+++++
     listing = models.ForeignKey(Listing, on_delete=models.PROTECT, related_name='bookings')  ####ForeignKey HIERRRR---+++++
 
     history = HistoricalRecords()
 
+    class Meta:
+        db_table = 'bookings'
+        verbose_name = 'Booking'
+        verbose_name_plural = 'Bookings'
+        ordering = ['-start_date']
+
+    def __str__(self):
+        return f'{self.guest} — {self.listing} ({self.start_date:%d.%m.%Y} – {self.end_date:%d.%m.%Y})'
+
 
     #Date validation
     def clean(self):
+        super().clean()
         if self.start_date >= self.end_date:
             raise ValidationError("The end date must be later than the start date.")
+
+        overlapping = Booking.objects.filter(
+            listing=self.listing,
+            start_date__lt=self.end_date,
+            end_date__gt=self.start_date,
+        ).exclude(pk=self.pk)
+
+        if overlapping.exists():
+            raise ValidationError("This listing is already booked for the selected dates.")
+
+    def save(self, *args, **kwargs):
+        if not self.price:
+            nights = (self.end_date - self.start_date).days
+            self.price = self.listing.price_per_night * nights
+        super().save(*args, **kwargs)
 
 
 
