@@ -1,25 +1,27 @@
-# from .models import Booking
-# from rest_framework import serializers
-# from django.utils import timezone
-#
-#
-# #-----------------------------------------------------------------------------------------------------------------------
-#
-#
-# class BookingListSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Booking
-#         fields = ['id', 'owner', 'title', 'description', 'status', 'deadline', ]
-#
-#
-# class TaskCreateSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Task
-#         fields = ['title', 'owner', 'description', 'status', 'deadline',]
-#         read_only_fields = ['owner']
-#
-#
-#     def validate_deadline(self, value):
-#         if value < timezone.now():
-#             raise serializers.ValidationError('Deadline can`t be in past')
-#         return value
+from .models import Booking
+from rest_framework import serializers
+from django.utils import timezone
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+
+class BookingListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = ['id', 'start_date', 'end_date', 'price', 'payment_type',
+                  'prepayment_type', 'guests_count', 'guest', 'listing', 'created_at']
+        read_only_fields = ['price']
+
+
+#----------------------              ------------------------------              ---------------------------------------
+
+
+class BookingCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = [
+            'start_date', 'end_date', 'payment_type', 'prepayment_type', 'guests_count', 'listing']
+
+
+

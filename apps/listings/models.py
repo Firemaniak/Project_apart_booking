@@ -60,7 +60,7 @@ class Listing(UniqueID, TimeStampedModel):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
                               related_name='listings') ###ForeignKey HIERRRR---+++++
 
-    photo = models.ImageField(upload_to='listing_photo/', blank=True, null=True)
+    photo = models.ImageField(upload_to='listing_photo/')
 
     price_per_night = models.DecimalField(
         max_digits=8, decimal_places=2,

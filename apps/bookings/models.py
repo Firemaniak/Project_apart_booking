@@ -34,6 +34,9 @@ class Booking(TimeStampedModel, UniqueID):
     end_date = models.DateTimeField()
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)],
                                 verbose_name='price')
+    guests_count = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)],
+                                                    verbose_name='number of guests'
+    )
     payment_type = models.CharField(max_length=10,
                                     choices=PayTypeChoices, default=PayTypeChoices.bank_cart,
                                   verbose_name='payment type')
@@ -60,6 +63,13 @@ class Booking(TimeStampedModel, UniqueID):
         super().clean()
         if self.start_date >= self.end_date:
             raise ValidationError("The end date must be later than the start date.")
+
+        nights = (self.end_date - self.start_date).days
+        if nights < 1:
+            raise ValidationError("Booking must be at least one night.")
+
+        if self.guests_count > self.listing.room_count * 2:
+            raise ValidationError("Too many guests for this listing.")
 
         overlapping = Booking.objects.filter(
             listing=self.listing,
