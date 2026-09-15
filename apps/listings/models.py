@@ -31,6 +31,8 @@ class Listing(UniqueID, TimeStampedModel):
                                  verbose_name='floor')    #Бурдж-Халифа в Дубае, ОАЭ имеет 163 этажа
     country = models.CharField(max_length=30, validators=[MinLengthValidator(2)],
                                  verbose_name='country')
+    max_guests = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)],
+                                                  verbose_name='maximum number of guests')
     room_count = models.PositiveIntegerField(validators=[MinValueValidator(1),MaxValueValidator(20)],
                                  verbose_name='number of rooms')
     shower_count = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)],
@@ -81,6 +83,11 @@ class Listing(UniqueID, TimeStampedModel):
         verbose_name = 'Listing'
         verbose_name_plural = 'Listings'
         ordering = ['apartment_name', 'country', 'room_count']
+
+        indexes = [
+            models.Index(fields=['country']),
+            models.Index(fields=['price_per_night']),
+        ]
 
 
 #-----------------------------------------------------------------------------------------------------------------------

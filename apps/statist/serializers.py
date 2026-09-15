@@ -16,5 +16,5 @@ class ListingStatisticSerializer(serializers.ModelSerializer):
 class UserStatisticSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserStatistic
-        fields = ['user', 'bookings_count', 'listings_count', 'average_rating_as_host',
+        fields = ['user', 'bookings_count', 'listings_count', 'stars_count',
                   'total_earned', 'total_spent']

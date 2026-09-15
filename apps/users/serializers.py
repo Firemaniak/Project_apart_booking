@@ -6,7 +6,7 @@ from .models import User
 #-----------------------------------------------------------------------------------------------------------------------
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'avatar', 'date_joined']
@@ -35,3 +35,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user.set_password(password)  # хеширует пароль, не хранит plain text
         user.save()
         return user
+
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name',
+                  'birth_date', 'bio', 'address', 'phone', 'avatar']
+        read_only_fields = ['id', 'username']
