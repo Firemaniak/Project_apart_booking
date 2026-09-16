@@ -1,3 +1,6 @@
+from django.db.models.deletion import ProtectedError
+from rest_framework.exceptions import ValidationError as DRFValidationError
+
 from rest_framework import generics, permissions
 
 from apps.core.permissions import IsOwnerOrReadOnly
@@ -26,6 +29,12 @@ class ListingDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ('PUT', 'PATCH'):
             return ListingCreateSerializer
         return ListingListSerializer
+
+    def perform_destroy(self, instance):
+        try:
+            instance.delete()
+        except ProtectedError:
+            raise DRFValidationError("Can't delete a listing that has existing bookings.")
 
 
 class MyListingListView(generics.ListAPIView):

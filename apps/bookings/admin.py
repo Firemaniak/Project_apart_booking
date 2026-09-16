@@ -6,3 +6,4 @@ from .models import Booking
 class BookingAdmin(SimpleHistoryAdmin):
     list_display = ['guest', 'listing', 'start_date', 'end_date', 'price', 'payment_type']
     list_filter = ['payment_type', 'prepayment_type']
+    readonly_fields = ['price']
