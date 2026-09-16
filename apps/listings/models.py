@@ -1,7 +1,7 @@
 from django.db import models
 
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import MinValueValidator, MaxValueValidator, MinLengthValidator, MaxLengthValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, MinLengthValidator
 from django.conf import settings
 
 from apps.core.models import UniqueID, TimeStampedModel
@@ -17,18 +17,24 @@ class InputTypeChoices(models.TextChoices):
     with_card = 'card', _('Card')
 
 
+class PropertyTypeChoices(models.TextChoices):
+    apartment = 'apartment', _('Apartment')
+    house = 'house', _('House')
+    room = 'room', _('Room')
+
+
 #-----------------------------------------------------------------------------------------------------------------------
 
 
 class Listing(UniqueID, TimeStampedModel):
-    apartment_name = models.CharField(max_length=30, validators=[MinLengthValidator(3),MaxLengthValidator(30)],
+    apartment_name = models.CharField(max_length=30, validators=[MinLengthValidator(3)],
                                   verbose_name='apartment name')
     description = models.TextField(blank=True,
                                    verbose_name='description')
     address = models.CharField(max_length=60, validators=[MinLengthValidator(5)],
                                  verbose_name='address')
     floor = models.PositiveIntegerField(validators=[MinValueValidator(1),MaxValueValidator(165)],
-                                 verbose_name='floor')    #Бурдж-Халифа в Дубае, ОАЭ имеет 163 этажа
+                                 verbose_name='floor')
     country = models.CharField(max_length=30, validators=[MinLengthValidator(2)],
                                  verbose_name='country')
     max_guests = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)],
@@ -60,9 +66,7 @@ class Listing(UniqueID, TimeStampedModel):
                                    verbose_name='Is there an elevator?')
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-                              related_name='listings') ###ForeignKey HIERRRR---+++++
-
-    photo = models.ImageField(upload_to='listing_photo/')
+                              related_name='listings')
 
     price_per_night = models.DecimalField(
         max_digits=8, decimal_places=2,
@@ -70,20 +74,21 @@ class Listing(UniqueID, TimeStampedModel):
         verbose_name='price per night'
     )
 
+    property_type = models.CharField(
+        max_length=15, choices=PropertyTypeChoices, default=PropertyTypeChoices.apartment,
+        verbose_name='property type'
+    )
+
     history = HistoricalRecords()
-
-
 
     def __str__(self):
         return f'Apartment: {self.apartment_name}, {self.country}, {self.room_count} rooms'
-
 
     class Meta:
         db_table = 'listings'
         verbose_name = 'Listing'
         verbose_name_plural = 'Listings'
         ordering = ['apartment_name', 'country', 'room_count']
-
         indexes = [
             models.Index(fields=['country']),
             models.Index(fields=['price_per_night']),
@@ -91,3 +96,17 @@ class Listing(UniqueID, TimeStampedModel):
 
 
 #-----------------------------------------------------------------------------------------------------------------------
+
+
+class Photo(UniqueID, TimeStampedModel):
+    image = models.ImageField(upload_to='listing_photos/')
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='photos')
+
+    def __str__(self):
+        return f'Photo for {self.listing.apartment_name}'
+
+    class Meta:
+        db_table = 'photos'
+        verbose_name = 'Photo'
+        verbose_name_plural = 'Photos'
+        ordering = ['created_at']

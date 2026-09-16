@@ -1,4 +1,4 @@
-from .models import Listing
+from .models import Listing, Photo
 from rest_framework import serializers
 from django.utils import timezone
 
@@ -6,10 +6,26 @@ from django.utils import timezone
 #-----------------------------------------------------------------------------------------------------------------------
 
 
+class PhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = ['id', 'image', 'listing']
+
+
+    def validate_listing(self, value):
+        request = self.context.get('request')
+        if request and value.owner != request.user:
+            raise serializers.ValidationError("You can only add photos to your own listings.")
+        return value
+
+
 class ListingListSerializer(serializers.ModelSerializer):
+    photos = PhotoSerializer(many=True, read_only=True)
+
     class Meta:
         model = Listing
-        fields = ['id', 'apartment_name', 'country', 'address', 'max_guests', 'parking', 'elevator', 'price_per_night']
+        fields = ['id', 'apartment_name', 'country', 'address', 'max_guests', 'parking', 'elevator', 'price_per_night',
+                  'property_type',]
 
 
 class ListingCreateSerializer(serializers.ModelSerializer):
@@ -20,8 +36,13 @@ class ListingCreateSerializer(serializers.ModelSerializer):
             'room_count', 'shower_count', 'toilets_count', 'max_guests', 'input_type',
             'parking', 'can_smoke', 'wifi', 'indoor_fireplace', 'can_pets',
             'facilities_for_guests_with_disabilities', 'air_conditioner', 'elevator',
-            'photo', 'price_per_night',
+            'price_per_night', 'property_type',
         ]
+
+
+
+#----------------------------------------------------------------------------------------------------------------
+
 
 
 

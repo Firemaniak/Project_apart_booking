@@ -1,8 +1,8 @@
 from rest_framework import generics, permissions
 
 from apps.core.permissions import IsOwnerOrReadOnly
-from .models import Listing
-from .serializers import ListingListSerializer, ListingCreateSerializer
+from .models import Listing, Photo
+from .serializers import ListingListSerializer, ListingCreateSerializer, PhotoSerializer
 
 
 class ListingListCreateView(generics.ListCreateAPIView):
@@ -20,5 +20,40 @@ class ListingListCreateView(generics.ListCreateAPIView):
 
 class ListingDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Listing.objects.all()
-    serializer_class = ListingCreateSerializer
     permission_classes = [IsOwnerOrReadOnly]
+
+    def get_serializer_class(self):
+        if self.request.method in ('PUT', 'PATCH'):
+            return ListingCreateSerializer
+        return ListingListSerializer
+
+
+class MyListingListView(generics.ListAPIView):
+    serializer_class = ListingListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Listing.objects.filter(owner=self.request.user)
+
+
+class PhotoListView(generics.ListAPIView):
+    queryset = Photo.objects.all()
+    serializer_class = PhotoSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class PhotoCreateView(generics.CreateAPIView):
+    serializer_class = PhotoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class PhotoDeleteView(generics.DestroyAPIView):
+    queryset = Photo.objects.all()
+    serializer_class = PhotoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_destroy(self, instance):
+        if instance.listing.owner != self.request.user:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You can only delete photos from your own listings.")
+        instance.delete()
