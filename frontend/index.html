@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Каталог объявлений</title>
+</head>
+<body>
+    <h1>Все объявления</h1>
+
+    <p>
+        <a href="login.html">Войти</a> |
+        <a href="register.html">Регистрация</a> |
+        <a href="profile.html">Профиль</a> |
+        <a href="listing-create.html">Создать объявление</a>
+        <a href="my-listings.html">Мои объявления</a> |
+        <a href="my-bookings.html">Мои брони</a> |
+        <span id="userStatus"></span>
+        <button id="logoutBtn" style="display: none;">Выйти</button>
+    </p>
+
+    <div id="listingsContainer">Загрузка...</div>
+
+    <script src="js/api.js"></script>
+    <script>
+        const listingsContainer = document.getElementById('listingsContainer');
+        const userStatus = document.getElementById('userStatus');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Показываем, залогинен ли юзер
+        if (isLoggedIn()) {
+            userStatus.textContent = 'Вы вошли в систему';
+            logoutBtn.style.display = 'inline';
+        }
+
+        logoutBtn.addEventListener('click', function () {
+            clearTokens();
+            window.location.reload();
+        });
+
+        // Загружаем список листингов
+        async function loadListings() {
+            try {
+                const listings = await apiGet('/listings/');
+                renderListings(listings);
+            } catch (err) {
+                listingsContainer.textContent = 'Не удалось загрузить объявления: ' + err.data?.detail;
+            }
+        }
+
+        function renderListings(listings) {
+            if (listings.length === 0) {
+                listingsContainer.textContent = 'Объявлений пока нет.';
+                return;
+            }
+
+            listingsContainer.innerHTML = '';
+
+            listings.forEach(function (listing) {
+                const card = document.createElement('div');
+                card.style.border = '1px solid #ccc';
+                card.style.padding = '10px';
+                card.style.marginBottom = '10px';
+
+                const photoUrl = listing.photos && listing.photos.length > 0
+                    ? listing.photos[0].image
+                    : null;
+
+                card.innerHTML = `
+                    ${photoUrl ? `<img src="${photoUrl}" width="200">` : '<p>Нет фото</p>'}
+                    <h3>${listing.apartment_name}</h3>
+                    <p>${listing.country}, ${listing.address}</p>
+                    <p>До ${listing.max_guests} гостей</p>
+                    <p><strong>${listing.price_per_night} €</strong> / сутки</p>
+                    <a href="listing-detail.html?id=${listing.id}">Подробнее</a>
+                `;
+
+                listingsContainer.appendChild(card);
+            });
+        }
+
+        loadListings();
+    </script>
+</body>
+</html>

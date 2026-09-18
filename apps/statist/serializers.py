@@ -9,11 +9,11 @@ from django.utils import timezone
 class ListingStatisticSerializer(serializers.ModelSerializer):
     class Meta:
         model = ListingStatistic
-        fields = ['listing', 'views_count', 'bookings_count', 'total_revenue',
+        fields = ['listing', 'view_count', 'booking_count', 'total_revenue',
                   'average_rating', 'reviews_count']
 
 
 class UserStatisticSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserStatistic
-        fields = ['user', 'bookings_count', 'listings_count', 'stars_count',]
+        fields = ['user', 'booking_count', 'listing_count', 'stars_count',]

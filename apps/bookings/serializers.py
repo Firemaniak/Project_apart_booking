@@ -26,7 +26,7 @@ class BookingCreateSerializer(serializers.ModelSerializer):
         if attrs['start_date'] >= attrs['end_date']:
             raise serializers.ValidationError('The end date must be later than the start date.')
 
-        if attrs['start_date'] < timezone.now():
+        if attrs['start_date'].date() < timezone.localtime(timezone.now()).date():
             raise serializers.ValidationError('Start date cannot be in the past.')
 
         overlapping = Booking.objects.filter(
@@ -50,9 +50,3 @@ class BookingCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("You can't book your own listing.")
 
         return attrs
-
-
-
-
-
-

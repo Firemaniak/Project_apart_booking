@@ -21,11 +21,12 @@ class PhotoSerializer(serializers.ModelSerializer):
 
 class ListingListSerializer(serializers.ModelSerializer):
     photos = PhotoSerializer(many=True, read_only=True)
+    owner_username = serializers.CharField(source='owner.username', read_only=True)
 
     class Meta:
         model = Listing
         fields = ['id', 'apartment_name', 'country', 'address', 'max_guests', 'parking', 'elevator', 'price_per_night',
-                  'property_type',]
+                  'property_type', 'photos', 'owner', 'owner_username']
 
 
 class ListingCreateSerializer(serializers.ModelSerializer):

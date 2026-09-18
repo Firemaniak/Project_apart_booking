@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.db.models import Avg, Count
 from django.db.models.signals import post_save, post_delete
@@ -5,8 +7,14 @@ from django.dispatch import receiver
 
 from apps.bookings.models import Booking
 from apps.reviews.models import Review
+from apps.listings.models import Listing
 from .models import ListingStatistic, UserStatistic
 
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+
+logger = logging.getLogger('apps.statist')
 
 
 # Создание UserStatistic при регистрации
@@ -15,7 +23,7 @@ from .models import ListingStatistic, UserStatistic
 def create_user_statistic(sender, instance, created, **kwargs):
     if created:
         UserStatistic.objects.get_or_create(user=instance)
-
+        logger.info(f'UserStatistic created for new user {instance.username}')
 
 
 # Booking → обновление статистики листинга и юзеров
@@ -41,6 +49,7 @@ def on_booking_created(sender, instance, created, **kwargs):
     )
     owner_stat.save()
 
+    logger.info(f'Statistics updated after booking {instance.id} (listing={instance.listing.id}, guest={instance.guest.username})')
 
 
 # Review → обновление рейтинга листинга и хозяина
@@ -61,16 +70,16 @@ def on_review_saved(sender, instance, **kwargs):
     owner_stat.stars_count = owner_agg['avg']
     owner_stat.save()
 
+    logger.info(f'Rating recalculated for listing {listing.id} after review {instance.id}')
+
 
 @receiver(post_delete, sender=Review)
 def on_review_deleted(sender, instance, **kwargs):
     on_review_saved(sender=Review, instance=instance)
-
+    logger.info(f'Rating recalculated for listing {instance.booking.listing.id} after review deletion')
 
 
 # Listing → обновление listing_count у владельца
-
-from apps.listings.models import Listing
 
 @receiver(post_save, sender=Listing)
 def on_listing_created(sender, instance, created, **kwargs):
@@ -79,3 +88,4 @@ def on_listing_created(sender, instance, created, **kwargs):
     owner_stat, _ = UserStatistic.objects.get_or_create(user=instance.owner)
     owner_stat.listing_count = instance.owner.listings.count()
     owner_stat.save()
+    logger.info(f'listing_count updated for owner {instance.owner.username} after new listing {instance.id}')

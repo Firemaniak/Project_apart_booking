@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать объявление</title>
+</head>
+<body>
+    <p><a href="my-listings.html">← Назад к моим объявлениям</a></p>
+    <h1>Редактировать объявление</h1>
+
+    <form id="listingForm">
+        <div><label>Название:</label><input type="text" id="apartmentName" required></div>
+        <div><label>Описание:</label><textarea id="description"></textarea></div>
+        <div><label>Страна:</label><input type="text" id="country" required></div>
+        <div><label>Адрес:</label><input type="text" id="address" required></div>
+        <div><label>Этаж:</label><input type="number" id="floor" min="1" required></div>
+        <div><label>Тип жилья:</label>
+            <select id="propertyType">
+                <option value="apartment">Квартира</option>
+                <option value="house">Дом</option>
+                <option value="room">Комната</option>
+            </select>
+        </div>
+        <div><label>Количество комнат:</label><input type="number" id="roomCount" min="1" required></div>
+        <div><label>Количество ванных:</label><input type="number" id="showerCount" min="1" required></div>
+        <div><label>Количество туалетов:</label><input type="number" id="toiletsCount" min="1" required></div>
+        <div><label>Макс. гостей:</label><input type="number" id="maxGuests" min="1" required></div>
+        <div><label>Как попасть внутрь:</label>
+            <select id="inputType">
+                <option value="key">Ключ</option>
+                <option value="pin_kode">Пин-код</option>
+                <option value="card">Карта</option>
+            </select>
+        </div>
+        <div><label>Цена за сутки (€):</label><input type="number" id="pricePerNight" step="0.01" min="0.01" required></div>
+
+        <div><label><input type="checkbox" id="parking"> Парковка</label></div>
+        <div><label><input type="checkbox" id="wifi"> Wi-Fi</label></div>
+        <div><label><input type="checkbox" id="canSmoke"> Можно курить</label></div>
+        <div><label><input type="checkbox" id="canPets"> Можно с питомцами</label></div>
+        <div><label><input type="checkbox" id="indoorFireplace"> Камин</label></div>
+        <div><label><input type="checkbox" id="airConditioner"> Кондиционер</label></div>
+        <div><label><input type="checkbox" id="elevator"> Лифт</label></div>
+        <div><label><input type="checkbox" id="facilities"> Доступно для людей с инвалидностью</label></div>
+
+        <button type="submit">Сохранить изменения</button>
+    </form>
+
+    <h2>Фото</h2>
+    <div id="photosContainer"></div>
+
+    <h3>Добавить новое фото</h3>
+    <input type="file" id="photoInput" accept="image/*" multiple>
+    <button id="uploadPhotosBtn" type="button">Загрузить</button>
+    <p id="photoMessage"></p>
+
+    <p id="message"></p>
+
+    <script src="js/api.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const listingId = params.get('id');
+
+        async function loadListing() {
+            try {
+                const listing = await apiGet(`/listings/${listingId}/`);
+                fillForm(listing);
+                renderPhotos(listing);
+            } catch (err) {
+                document.getElementById('message').textContent = 'Не удалось загрузить объявление.';
+            }
+        }
+
+        function fillForm(listing) {
+            document.getElementById('apartmentName').value = listing.apartment_name;
+            document.getElementById('description').value = listing.description || '';
+            document.getElementById('country').value = listing.country;
+            document.getElementById('address').value = listing.address;
+            document.getElementById('floor').value = listing.floor;
+            document.getElementById('propertyType').value = listing.property_type;
+            document.getElementById('roomCount').value = listing.room_count;
+            document.getElementById('showerCount').value = listing.shower_count;
+            document.getElementById('toiletsCount').value = listing.toilets_count;
+            document.getElementById('maxGuests').value = listing.max_guests;
+            document.getElementById('inputType').value = listing.input_type;
+            document.getElementById('pricePerNight').value = listing.price_per_night;
+            document.getElementById('parking').checked = listing.parking;
+            document.getElementById('wifi').checked = listing.wifi;
+            document.getElementById('canSmoke').checked = listing.can_smoke;
+            document.getElementById('canPets').checked = listing.can_pets;
+            document.getElementById('indoorFireplace').checked = listing.indoor_fireplace;
+            document.getElementById('airConditioner').checked = listing.air_conditioner;
+            document.getElementById('elevator').checked = listing.elevator;
+            document.getElementById('facilities').checked = listing.facilities_for_guests_with_disabilities;
+        }
+
+        function renderPhotos(listing) {
+            const container = document.getElementById('photosContainer');
+            const photos = listing.photos || [];
+
+            if (photos.length === 0) {
+                container.textContent = 'Фото пока нет.';
+                return;
+            }
+
+            container.innerHTML = photos.map(function (photo) {
+                return `
+                    <div style="display: inline-block; margin-right: 10px; text-align: center;">
+                        <img src="${photo.image}" width="150"><br>
+                        <button type="button" onclick="deletePhoto('${photo.id}')">Удалить</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function deletePhoto(photoId) {
+            if (!confirm('Удалить это фото?')) return;
+            try {
+                await apiDelete(`/listings/photos/${photoId}/delete/`);
+                await loadListing();
+            } catch (err) {
+                alert('Не удалось удалить фото: ' + JSON.stringify(err.data));
+            }
+        }
+
+        document.getElementById('uploadPhotosBtn').addEventListener('click', async function () {
+            const files = document.getElementById('photoInput').files;
+            const photoMessage = document.getElementById('photoMessage');
+
+            if (files.length === 0) {
+                photoMessage.textContent = 'Выберите хотя бы один файл.';
+                return;
+            }
+
+            let uploaded = 0;
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('listing', listingId);
+
+                try {
+                    await apiPost('/listings/photos/create/', formData);
+                    uploaded++;
+                } catch (err) {
+                    console.error('Ошибка загрузки фото:', err);
+                }
+            }
+
+            photoMessage.style.color = 'green';
+            photoMessage.textContent = `Загружено: ${uploaded} из ${files.length}`;
+            document.getElementById('photoInput').value = '';
+            await loadListing();
+        });
+
+        document.getElementById('listingForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const message = document.getElementById('message');
+
+            const payload = {
+                apartment_name: document.getElementById('apartmentName').value,
+                description: document.getElementById('description').value,
+                country: document.getElementById('country').value,
+                address: document.getElementById('address').value,
+                floor: parseInt(document.getElementById('floor').value),
+                property_type: document.getElementById('propertyType').value,
+                room_count: parseInt(document.getElementById('roomCount').value),
+                shower_count: parseInt(document.getElementById('showerCount').value),
+                toilets_count: parseInt(document.getElementById('toiletsCount').value),
+                max_guests: parseInt(document.getElementById('maxGuests').value),
+                input_type: document.getElementById('inputType').value,
+                price_per_night: document.getElementById('pricePerNight').value,
+                parking: document.getElementById('parking').checked,
+                wifi: document.getElementById('wifi').checked,
+                can_smoke: document.getElementById('canSmoke').checked,
+                can_pets: document.getElementById('canPets').checked,
+                indoor_fireplace: document.getElementById('indoorFireplace').checked,
+                air_conditioner: document.getElementById('airConditioner').checked,
+                elevator: document.getElementById('elevator').checked,
+                facilities_for_guests_with_disabilities: document.getElementById('facilities').checked,
+            };
+
+            try {
+                await apiPatch(`/listings/${listingId}/`, payload);
+                message.style.color = 'green';
+                message.textContent = 'Изменения сохранены!';
+            } catch (err) {
+                message.style.color = 'red';
+                message.textContent = JSON.stringify(err.data);
+            }
+        });
+
+        loadListing();
+    </script>
+</body>
+</html>

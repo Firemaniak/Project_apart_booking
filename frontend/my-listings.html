@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои объявления</title>
+</head>
+<body>
+    <p><a href="index.html">← Назад к каталогу</a></p>
+    <h1>Мои объявления</h1>
+
+    <p id="authWarning" style="display: none; color: red;">
+        Нужно <a href="login.html">войти</a>, чтобы увидеть свои объявления.
+    </p>
+
+    <div id="listingsContainer"></div>
+
+    <script src="js/api.js"></script>
+    <script>
+        if (!isLoggedIn()) {
+            document.getElementById('authWarning').style.display = 'block';
+        } else {
+            loadMyListings();
+        }
+
+        async function loadMyListings() {
+            const container = document.getElementById('listingsContainer');
+            try {
+                const listings = await apiGet('/listings/my/');
+                if (listings.length === 0) {
+                    container.textContent = 'У вас пока нет объявлений.';
+                    return;
+                }
+                container.innerHTML = listings.map(function (listing) {
+                    const photoUrl = listing.photos && listing.photos.length > 0
+                        ? listing.photos[0].image
+                        : null;
+                    return `
+                        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+                            ${photoUrl ? `<img src="${photoUrl}" width="150">` : ''}
+                            <h3>${listing.apartment_name}</h3>
+                            <p>${listing.country}, ${listing.address}</p>
+                            <p><strong>${listing.price_per_night} €</strong> / сутки</p>
+                            <a href="listing-detail.html?id=${listing.id}">Посмотреть</a> |
+                            <a href="listing-edit.html?id=${listing.id}">Редактировать</a> |
+                            <a href="statistics.html?listing_id=${listing.id}">Статистика</a>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                container.textContent = 'Не удалось загрузить объявления.';
+            }
+        }
+    </script>
+</body>
+</html>

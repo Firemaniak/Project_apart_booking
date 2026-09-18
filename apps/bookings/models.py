@@ -64,7 +64,7 @@ class Booking(TimeStampedModel, UniqueID):
         if self.start_date >= self.end_date:
             raise ValidationError("The end date must be later than the start date.")
 
-        nights = (self.end_date - self.start_date).days
+        nights = (self.end_date.date() - self.start_date.date()).days
         if nights < 1:
             raise ValidationError("Booking must be at least one night.")
 
@@ -82,7 +82,7 @@ class Booking(TimeStampedModel, UniqueID):
 
     def save(self, *args, **kwargs):
         if not self.price:
-            nights = (self.end_date - self.start_date).days
+            nights = (self.end_date.date() - self.start_date.date()).days
             self.price = self.listing.price_per_night * nights
         super().save(*args, **kwargs)
 

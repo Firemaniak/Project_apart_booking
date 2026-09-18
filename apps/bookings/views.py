@@ -1,7 +1,7 @@
+import logging
+
 from django.db.models import Q
 from django.db.models.deletion import ProtectedError
-from django.utils import timezone
-
 from rest_framework import generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,6 +15,9 @@ from .serializers import BookingListSerializer, BookingCreateSerializer
 #-----------------------------------------------------------------------------------------------------------------------
 
 
+logger = logging.getLogger('apps.bookings')
+
+
 class BookingListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -24,13 +27,18 @@ class BookingListCreateView(generics.ListCreateAPIView):
         return BookingListSerializer
 
     def get_queryset(self):
+
+        if getattr(self, 'swagger_fake_view', False):
+            return Booking.objects.none()
+
         user = self.request.user
         return Booking.objects.filter(
             Q(guest=user) | Q(listing__owner=user)
         ).select_related('listing', 'guest')
 
     def perform_create(self, serializer):
-        serializer.save(guest=self.request.user)
+        booking = serializer.save(guest=self.request.user)
+        logger.info(f'Booking {booking.id} created by {self.request.user.username} for listing {booking.listing.id}')
 
 
 class BookingDetailView(generics.RetrieveDestroyAPIView):
@@ -38,12 +46,18 @@ class BookingDetailView(generics.RetrieveDestroyAPIView):
     permission_classes = [IsBookingParticipant]
 
     def get_queryset(self):
+
+        if getattr(self, 'swagger_fake_view', False):
+            return Booking.objects.none()
+
         user = self.request.user
         return Booking.objects.filter(
             Q(guest=user) | Q(listing__owner=user)
         ).select_related('listing', 'guest')
 
     def perform_destroy(self, instance):
+        if instance.end_date < timezone.now():
+            raise DRFValidationError("Can't cancel a booking that has already ended.")
         try:
             instance.delete()
         except ProtectedError:
@@ -51,7 +65,6 @@ class BookingDetailView(generics.RetrieveDestroyAPIView):
 
 
 class ListingBookedDatesView(APIView):
-    """Отдаёт список занятых диапазонов дат для конкретного листинга — для фронтенд-календаря."""
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, listing_id):

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+</head>
+<body>
+    <h1>Регистрация</h1>
+
+    <form id="registerForm">
+        <div>
+            <label>Имя пользователя:</label>
+            <input type="text" id="username" required>
+        </div>
+        <div>
+            <label>Email:</label>
+            <input type="email" id="email" required>
+        </div>
+        <div>
+            <label>Пароль:</label>
+            <input type="password" id="password" required>
+        </div>
+        <div>
+            <label>Повторите пароль:</label>
+            <input type="password" id="passwordConfirm" required>
+        </div>
+        <div>
+            <label>Дата рождения:</label>
+            <input type="date" id="birthDate">
+        </div>
+        <div>
+            <label>Телефон:</label>
+            <input type="tel" id="phone">
+        </div>
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+
+    <p id="errorMessage" style="color: red;"></p>
+    <p><a href="login.html">Уже есть аккаунт? Войти</a></p>
+
+    <script src="js/api.js"></script>
+    <script>
+        const form = document.getElementById('registerForm');
+        const errorMessage = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            errorMessage.textContent = '';
+
+            const payload = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                password_confirm: document.getElementById('passwordConfirm').value,
+            };
+
+            const birthDate = document.getElementById('birthDate').value;
+            if (birthDate) payload.birth_date = birthDate;
+
+            const phone = document.getElementById('phone').value;
+            if (phone) payload.phone = phone;
+
+            try {
+                await apiPost('/users/register/', payload);
+                alert('Регистрация прошла успешно! Теперь войдите.');
+                window.location.href = 'login.html';
+            } catch (err) {
+                errorMessage.textContent = formatErrors(err.data);
+            }
+        });
+
+        function formatErrors(data) {
+            if (!data) return 'Произошла ошибка';
+            return Object.entries(data)
+                .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+                .join(' | ');
+        }
+    </script>
+</body>
+</html>

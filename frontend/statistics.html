@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Статистика объявления</title>
+</head>
+<body>
+    <p><a href="my-listings.html">← Назад к моим объявлениям</a></p>
+    <h1>Статистика</h1>
+
+    <div id="statsContainer">Загрузка...</div>
+
+    <script src="js/api.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const listingId = params.get('listing_id');
+
+        async function loadStatistics() {
+            const container = document.getElementById('statsContainer');
+
+            if (!listingId) {
+                container.textContent = 'Объявление не указано.';
+                return;
+            }
+
+            try {
+                const stats = await apiGet(`/statistics/listing/${listingId}/`);
+                container.innerHTML = `
+                    <p>Просмотров: ${stats.view_count}</p>
+                    <p>Броней: ${stats.booking_count}</p>
+                    <p>Выручка: ${stats.total_revenue} €</p>
+                    <p>Средний рейтинг: ${stats.average_rating ?? 'нет отзывов'}</p>
+                    <p>Количество отзывов: ${stats.reviews_count}</p>
+                `;
+            } catch (err) {
+                container.textContent = 'Статистика пока недоступна для этого объявления.';
+            }
+        }
+
+        loadStatistics();
+    </script>
+</body>
+</html>

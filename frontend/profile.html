@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мой профиль</title>
+</head>
+<body>
+    <p><a href="index.html">← Назад к каталогу</a></p>
+    <h1>Мой профиль</h1>
+
+    <p id="authWarning" style="display: none; color: red;">
+        Нужно <a href="login.html">войти</a>, чтобы увидеть профиль.
+    </p>
+
+    <div id="profileContent" style="display: none;">
+        <h2>Статистика</h2>
+        <p>Заработано: <span id="totalEarned"></span> €</p>
+        <p>Потрачено: <span id="totalSpent"></span> €</p>
+        <p>Объявлений: <span id="listingCount"></span></p>
+        <p>Броней: <span id="bookingCount"></span></p>
+        <p>Средний рейтинг как хозяин: <span id="starsCount"></span></p>
+
+        <h2>Данные профиля</h2>
+        <form id="profileForm">
+            <div><label>Username:</label> <span id="usernameDisplay"></span></div>
+            <div><label>Email:</label><input type="email" id="email" required></div>
+            <div><label>Имя:</label><input type="text" id="firstName"></div>
+            <div><label>Фамилия:</label><input type="text" id="lastName"></div>
+            <div><label>Дата рождения:</label><input type="date" id="birthDate"></div>
+            <div><label>О себе:</label><textarea id="bio"></textarea></div>
+            <div><label>Адрес:</label><input type="text" id="address" required></div>
+            <div><label>Телефон:</label><input type="tel" id="phone"></div>
+            <button type="submit">Сохранить</button>
+        </form>
+        <p id="message"></p>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        if (!isLoggedIn()) {
+            document.getElementById('authWarning').style.display = 'block';
+        } else {
+            loadProfile();
+        }
+
+        async function loadProfile() {
+            try {
+                const profile = await apiGet('/users/me/');
+                fillProfile(profile);
+                document.getElementById('profileContent').style.display = 'block';
+            } catch (err) {
+                document.getElementById('authWarning').textContent = 'Не удалось загрузить профиль.';
+                document.getElementById('authWarning').style.display = 'block';
+            }
+        }
+
+        function fillProfile(profile) {
+            document.getElementById('totalEarned').textContent = profile.total_earned;
+            document.getElementById('totalSpent').textContent = profile.total_spent;
+            document.getElementById('listingCount').textContent = profile.listing_count;
+            document.getElementById('bookingCount').textContent = profile.booking_count;
+            document.getElementById('starsCount').textContent = profile.stars_count ?? 'нет отзывов';
+
+            document.getElementById('usernameDisplay').textContent = profile.username;
+            document.getElementById('email').value = profile.email;
+            document.getElementById('firstName').value = profile.first_name || '';
+            document.getElementById('lastName').value = profile.last_name || '';
+            document.getElementById('birthDate').value = profile.birth_date || '';
+            document.getElementById('bio').value = profile.bio || '';
+            document.getElementById('address').value = profile.address || '';
+            document.getElementById('phone').value = profile.phone || '';
+        }
+
+        document.getElementById('profileForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const message = document.getElementById('message');
+
+            const payload = {
+                email: document.getElementById('email').value,
+                first_name: document.getElementById('firstName').value,
+                last_name: document.getElementById('lastName').value,
+                bio: document.getElementById('bio').value,
+                address: document.getElementById('address').value,
+                phone: document.getElementById('phone').value,
+            };
+
+            const birthDate = document.getElementById('birthDate').value;
+            if (birthDate) payload.birth_date = birthDate;
+
+            try {
+                await apiPatch('/users/me/', payload);
+                message.style.color = 'green';
+                message.textContent = 'Профиль обновлён!';
+            } catch (err) {
+                message.style.color = 'red';
+                message.textContent = JSON.stringify(err.data);
+            }
+        });
+    </script>
+</body>
+</html>

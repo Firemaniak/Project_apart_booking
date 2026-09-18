@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Создать объявление</title>
+</head>
+<body>
+    <p><a href="index.html">← Назад к каталогу</a></p>
+    <h1>Новое объявление</h1>
+
+    <p id="authWarning" style="display: none; color: red;">
+        Нужно <a href="login.html">войти</a>, чтобы создать объявление.
+    </p>
+
+    <form id="listingForm">
+        <div><label>Название:</label><input type="text" id="apartmentName" required></div>
+        <div><label>Описание:</label><textarea id="description"></textarea></div>
+        <div><label>Страна:</label><input type="text" id="country" required></div>
+        <div><label>Адрес:</label><input type="text" id="address" required></div>
+        <div><label>Этаж:</label><input type="number" id="floor" min="1" required></div>
+        <div><label>Тип жилья:</label>
+            <select id="propertyType">
+                <option value="apartment">Квартира</option>
+                <option value="house">Дом</option>
+                <option value="room">Комната</option>
+            </select>
+        </div>
+        <div><label>Количество комнат:</label><input type="number" id="roomCount" min="1" required></div>
+        <div><label>Количество ванных:</label><input type="number" id="showerCount" min="1" required></div>
+        <div><label>Количество туалетов:</label><input type="number" id="toiletsCount" min="1" required></div>
+        <div><label>Макс. гостей:</label><input type="number" id="maxGuests" min="1" required></div>
+        <div><label>Как попасть внутрь:</label>
+            <select id="inputType">
+                <option value="key">Ключ</option>
+                <option value="pin_kode">Пин-код</option>
+                <option value="card">Карта</option>
+            </select>
+        </div>
+        <div><label>Цена за сутки (€):</label><input type="number" id="pricePerNight" step="0.01" min="0.01" required></div>
+
+        <div><label><input type="checkbox" id="parking"> Парковка</label></div>
+        <div><label><input type="checkbox" id="wifi"> Wi-Fi</label></div>
+        <div><label><input type="checkbox" id="canSmoke"> Можно курить</label></div>
+        <div><label><input type="checkbox" id="canPets"> Можно с питомцами</label></div>
+        <div><label><input type="checkbox" id="indoorFireplace"> Камин</label></div>
+        <div><label><input type="checkbox" id="airConditioner"> Кондиционер</label></div>
+        <div><label><input type="checkbox" id="elevator"> Лифт</label></div>
+        <div><label><input type="checkbox" id="facilities"> Доступно для людей с инвалидностью</label></div>
+
+        <button type="submit">Создать объявление</button>
+    </form>
+
+    <div id="photoSection" style="display: none;">
+        <h2>Добавить фото</h2>
+        <input type="file" id="photoInput" accept="image/*" multiple>
+        <button id="uploadPhotosBtn">Загрузить фото</button>
+        <p id="photoMessage"></p>
+        <a id="viewListingLink" href="#" style="display: none;">Перейти к объявлению →</a>
+    </div>
+
+    <p id="errorMessage" style="color: red;"></p>
+
+    <script src="js/api.js"></script>
+    <script>
+        if (!isLoggedIn()) {
+            document.getElementById('authWarning').style.display = 'block';
+            document.getElementById('listingForm').style.display = 'none';
+        }
+
+        let createdListingId = null;
+
+        document.getElementById('listingForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            document.getElementById('errorMessage').textContent = '';
+
+            const payload = {
+                apartment_name: document.getElementById('apartmentName').value,
+                description: document.getElementById('description').value,
+                country: document.getElementById('country').value,
+                address: document.getElementById('address').value,
+                floor: parseInt(document.getElementById('floor').value),
+                property_type: document.getElementById('propertyType').value,
+                room_count: parseInt(document.getElementById('roomCount').value),
+                shower_count: parseInt(document.getElementById('showerCount').value),
+                toilets_count: parseInt(document.getElementById('toiletsCount').value),
+                max_guests: parseInt(document.getElementById('maxGuests').value),
+                input_type: document.getElementById('inputType').value,
+                price_per_night: document.getElementById('pricePerNight').value,
+                parking: document.getElementById('parking').checked,
+                wifi: document.getElementById('wifi').checked,
+                can_smoke: document.getElementById('canSmoke').checked,
+                can_pets: document.getElementById('canPets').checked,
+                indoor_fireplace: document.getElementById('indoorFireplace').checked,
+                air_conditioner: document.getElementById('airConditioner').checked,
+                elevator: document.getElementById('elevator').checked,
+                facilities_for_guests_with_disabilities: document.getElementById('facilities').checked,
+            };
+
+            try {
+                const listing = await apiPost('/listings/', payload);
+                createdListingId = listing.id;
+
+                document.getElementById('listingForm').style.display = 'none';
+                document.getElementById('photoSection').style.display = 'block';
+            } catch (err) {
+                document.getElementById('errorMessage').textContent = JSON.stringify(err.data);
+            }
+        });
+
+        document.getElementById('uploadPhotosBtn').addEventListener('click', async function () {
+            const files = document.getElementById('photoInput').files;
+            const photoMessage = document.getElementById('photoMessage');
+
+            if (files.length === 0) {
+                photoMessage.textContent = 'Выберите хотя бы один файл.';
+                return;
+            }
+
+            let uploaded = 0;
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('listing', createdListingId);
+
+                try {
+                    await apiPost('/listings/photos/create/', formData);
+                    uploaded++;
+                } catch (err) {
+                    console.error('Ошибка загрузки фото:', err);
+                }
+            }
+
+            photoMessage.style.color = 'green';
+            photoMessage.textContent = `Загружено фото: ${uploaded} из ${files.length}`;
+
+            const link = document.getElementById('viewListingLink');
+            link.href = `listing-detail.html?id=${createdListingId}`;
+            link.style.display = 'inline';
+        });
+    </script>
+</body>
+</html>

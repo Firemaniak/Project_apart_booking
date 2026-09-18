@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Объявление</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+    <p><a href="index.html">← Назад к каталогу</a></p>
+
+    <div id="listingContainer">Загрузка...</div>
+
+    <hr>
+
+    <div id="bookingSection" style="display: none;">
+        <h2>Забронировать</h2>
+        <form id="bookingForm">
+            <div>
+                <label>Даты:</label>
+                <input type="text" id="dateRange" placeholder="Выберите даты" readonly>
+            </div>
+            <div>
+                <label>Количество гостей:</label>
+                <input type="number" id="guestsCount" min="1" value="1" required>
+            </div>
+            <button type="submit">Забронировать</button>
+        </form>
+        <p id="bookingMessage"></p>
+    </div>
+
+    <p id="loginPrompt" style="display: none;">
+        <a href="login.html">Войдите</a>, чтобы забронировать это жильё.
+    </p>
+
+    <hr>
+    <h2>Отзывы</h2>
+    <div id="reviewsContainer">Загрузка...</div>
+
+    <div id="reviewFormSection" style="display: none;">
+        <h3>Оставить отзыв</h3>
+        <form id="reviewForm">
+            <div>
+                <label>Бронь:</label>
+                <select id="reviewBookingSelect"></select>
+            </div>
+            <div>
+                <label>Оценка:</label>
+                <select id="reviewStars">
+                    <option value="5">5 - отлично</option>
+                    <option value="4">4 - хорошо</option>
+                    <option value="3">3 - нормально</option>
+                    <option value="2">2 - плохо</option>
+                    <option value="1">1 - ужасно</option>
+                </select>
+            </div>
+            <div>
+                <label>Комментарий:</label>
+                <textarea id="reviewComment" required minlength="10"></textarea>
+            </div>
+            <button type="submit">Отправить отзыв</button>
+        </form>
+        <p id="reviewMessage"></p>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const listingId = params.get('id');
+
+        const listingContainer = document.getElementById('listingContainer');
+        const bookingSection = document.getElementById('bookingSection');
+        const loginPrompt = document.getElementById('loginPrompt');
+        const bookingMessage = document.getElementById('bookingMessage');
+
+        let calendar = null;
+        let pricePerNight = 0;
+
+        async function loadListing() {
+            try {
+                const listing = await apiGet(`/listings/${listingId}/`);
+                renderListing(listing);
+                pricePerNight = parseFloat(listing.price_per_night);
+                await loadBookedDates();
+                await checkOwnership(listing);
+            } catch (err) {
+                listingContainer.textContent = 'Не удалось загрузить объявление.';
+            }
+        }
+
+        async function checkOwnership(listing) {
+            if (!isLoggedIn()) return;
+
+            try {
+                const profile = await apiGet('/users/me/');
+                if (profile.id === listing.owner) {
+                    bookingSection.style.display = 'none';
+                    loginPrompt.style.display = 'none';
+
+                    const ownerNotice = document.createElement('p');
+                    ownerNotice.textContent = 'Это ваше собственное объявление — забронировать его нельзя.';
+                    ownerNotice.style.color = 'gray';
+                    document.body.insertBefore(ownerNotice, bookingSection);
+                }
+            } catch (err) {
+                console.error('Не удалось проверить владельца:', err);
+            }
+        }
+
+        function renderListing(listing) {
+            const photosHtml = (listing.photos || [])
+                .map(p => `<img src="${p.image}" width="200" style="margin-right: 5px;">`)
+                .join('');
+
+            listingContainer.innerHTML = `
+                <h1>${listing.apartment_name}</h1>
+                <div>${photosHtml || '<p>Нет фото</p>'}</div>
+                <p>${listing.country}, ${listing.address}</p>
+                <p>До ${listing.max_guests} гостей</p>
+                <p><strong>${listing.price_per_night} €</strong> / сутки</p>
+                <p>Хозяин: <a href="user-profile.html?id=${listing.owner}">${listing.owner_username}</a></p>
+            `;
+        }
+
+        async function loadBookedDates() {
+            const response = await fetch(`${API_BASE_URL}/bookings/listing/${listingId}/booked-dates/`);
+            const bookedRanges = await response.json();
+
+            const disabledRanges = bookedRanges.map(r => ({ from: r.from, to: r.to }));
+
+            calendar = flatpickr('#dateRange', {
+                mode: 'range',
+                minDate: 'today',
+                dateFormat: 'Y-m-d',
+                disable: disabledRanges,
+            });
+        }
+
+        // Показываем форму бронирования только залогиненным
+        if (isLoggedIn()) {
+            bookingSection.style.display = 'block';
+        } else {
+            loginPrompt.style.display = 'block';
+        }
+
+        document.getElementById('bookingForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            bookingMessage.textContent = '';
+
+            const selectedDates = calendar.selectedDates;
+            if (selectedDates.length < 2) {
+                bookingMessage.textContent = 'Выберите дату заезда и выезда.';
+                return;
+            }
+
+            const rawStart = selectedDates[0];
+            const rawEnd = selectedDates[1];
+
+            rawStart.setHours(15, 0, 0, 0);
+            rawEnd.setHours(11, 0, 0, 0);
+
+            const startDate = rawStart.toISOString();
+            const endDate = rawEnd.toISOString();
+            const guestsCount = parseInt(document.getElementById('guestsCount').value);
+
+            try {
+                await apiPost('/bookings/', {
+                    listing: listingId,
+                    start_date: startDate,
+                    end_date: endDate,
+                    guests_count: guestsCount,
+                });
+                bookingMessage.style.color = 'green';
+                bookingMessage.textContent = 'Бронь успешно создана!';
+                await loadBookedDates();
+            } catch (err) {
+                bookingMessage.style.color = 'red';
+                bookingMessage.textContent = JSON.stringify(err.data);
+            }
+        });
+
+        async function loadReviews() {
+            const container = document.getElementById('reviewsContainer');
+            try {
+                const allReviews = await apiGet('/reviews/');
+                const listingReviews = [];
+
+                for (const review of allReviews) {
+                    const booking = await apiGet(`/bookings/${review.booking}/`).catch(() => null);
+                    if (booking && booking.listing === listingId) {
+                        listingReviews.push(review);
+                    }
+                }
+
+                if (listingReviews.length === 0) {
+                    container.textContent = 'Отзывов пока нет.';
+                } else {
+                    container.innerHTML = listingReviews.map(renderReview).join('');
+                }
+            } catch (err) {
+                container.textContent = 'Не удалось загрузить отзывы.';
+            }
+        }
+
+        function renderReview(review) {
+            const stars = '★'.repeat(review.stars) + '☆'.repeat(5 - review.stars);
+            return `
+                <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
+                    <p>${stars}</p>
+                    <p>${review.comment}</p>
+                    ${review.owner_response ? `<p style="margin-left: 20px; color: gray;"><strong>Ответ хозяина:</strong> ${review.owner_response}</p>` : ''}
+                </div>
+            `;
+        }
+
+        async function setupReviewForm() {
+            if (!isLoggedIn()) return;
+
+            try {
+                const myBookings = await apiGet('/bookings/');
+                const now = new Date();
+
+                const eligibleBookings = myBookings.filter(function (b) {
+                    return b.listing === listingId && new Date(b.end_date) < now;
+                });
+
+                if (eligibleBookings.length === 0) return;
+
+                const select = document.getElementById('reviewBookingSelect');
+                select.innerHTML = eligibleBookings.map(function (b) {
+                    const start = new Date(b.start_date).toLocaleDateString();
+                    const end = new Date(b.end_date).toLocaleDateString();
+                    return `<option value="${b.id}">${start} — ${end}</option>`;
+                }).join('');
+
+                document.getElementById('reviewFormSection').style.display = 'block';
+            } catch (err) {
+                console.error('Не удалось проверить брони для отзыва:', err);
+            }
+        }
+
+        document.getElementById('reviewForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const message = document.getElementById('reviewMessage');
+
+            const payload = {
+                booking: document.getElementById('reviewBookingSelect').value,
+                stars: parseInt(document.getElementById('reviewStars').value),
+                comment: document.getElementById('reviewComment').value,
+            };
+
+            try {
+                await apiPost('/reviews/', payload);
+                message.style.color = 'green';
+                message.textContent = 'Отзыв отправлен!';
+                document.getElementById('reviewForm').reset();
+                await loadReviews();
+            } catch (err) {
+                message.style.color = 'red';
+                message.textContent = JSON.stringify(err.data);
+            }
+        });
+
+        loadListing();
+        loadReviews();
+        setupReviewForm();
+    </script>
+</body>
+</html>

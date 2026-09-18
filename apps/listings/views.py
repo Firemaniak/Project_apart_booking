@@ -42,6 +42,10 @@ class MyListingListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+
+        if getattr(self, 'swagger_fake_view', False):
+            return Listing.objects.none()
+
         return Listing.objects.filter(owner=self.request.user)
 
 

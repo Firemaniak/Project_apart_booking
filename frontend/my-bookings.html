@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои брони</title>
+</head>
+<body>
+    <p><a href="index.html">← Назад к каталогу</a></p>
+    <h1>Мои брони</h1>
+
+    <p id="authWarning" style="display: none; color: red;">
+        Нужно <a href="login.html">войти</a>, чтобы увидеть свои брони.
+    </p>
+
+    <h2>Я бронировал(а)</h2>
+    <div id="asGuestContainer"></div>
+
+    <h2>Брони на мои объявления</h2>
+    <div id="asOwnerContainer"></div>
+
+    <script src="js/api.js"></script>
+    <script>
+        let currentUserId = null;
+
+        if (!isLoggedIn()) {
+            document.getElementById('authWarning').style.display = 'block';
+        } else {
+            init();
+        }
+
+        async function init() {
+            const profile = await apiGet('/users/me/');
+            currentUserId = profile.id;
+            await loadMyBookings();
+        }
+
+        async function loadMyBookings() {
+            const asGuestContainer = document.getElementById('asGuestContainer');
+            const asOwnerContainer = document.getElementById('asOwnerContainer');
+
+            try {
+                const bookings = await apiGet('/bookings/');
+
+                const asGuest = bookings.filter(b => b.guest === currentUserId);
+                const asOwner = bookings.filter(b => b.guest !== currentUserId);
+
+                asGuestContainer.innerHTML = asGuest.length
+                    ? asGuest.map(renderBooking).join('')
+                    : '<p>Вы пока ничего не бронировали.</p>';
+
+                asOwnerContainer.innerHTML = asOwner.length
+                    ? asOwner.map(renderBooking).join('')
+                    : '<p>На ваши объявления пока нет броней.</p>';
+
+            } catch (err) {
+                asGuestContainer.textContent = 'Не удалось загрузить брони.';
+            }
+        }
+
+        function renderBooking(booking) {
+    const start = new Date(booking.start_date).toLocaleDateString();
+    const end = new Date(booking.end_date).toLocaleDateString();
+    const isPast = new Date(booking.end_date) < new Date();
+
+    return `
+        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+            <p>${start} — ${end} ${isPast ? '<em>(завершена)</em>' : ''}</p>
+            <p>Гостей: ${booking.guests_count}</p>
+            <p>Цена: ${booking.price} €</p>
+            <a href="listing-detail.html?id=${booking.listing}">Объявление</a>
+            ${!isPast ? `<button onclick="cancelBooking('${booking.id}')">Отменить</button>` : ''}
+        </div>
+    `;
+}
+
+        async function cancelBooking(bookingId) {
+            if (!confirm('Точно отменить бронь?')) return;
+            try {
+                await apiDelete(`/bookings/${bookingId}/`);
+                await loadMyBookings();
+            } catch (err) {
+                alert('Не удалось отменить: ' + JSON.stringify(err.data));
+            }
+        }
+    </script>
+</body>
+</html>
