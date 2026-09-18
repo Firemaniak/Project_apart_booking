@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/style.css">
     <title>Объявление</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
@@ -75,6 +76,8 @@
 
         let calendar = null;
         let pricePerNight = 0;
+        let currentUserId = null;
+        let listingOwnerId = null;
 
         async function loadListing() {
             try {
@@ -108,6 +111,8 @@
         }
 
         function renderListing(listing) {
+            listingOwnerId = listing.owner;
+
             const photosHtml = (listing.photos || [])
                 .map(p => `<img src="${p.image}" width="200" style="margin-right: 5px;">`)
                 .join('');
@@ -182,6 +187,11 @@
         async function loadReviews() {
             const container = document.getElementById('reviewsContainer');
             try {
+                if (isLoggedIn()) {
+                    const profile = await apiGet('/users/me/');
+                    currentUserId = profile.id;
+                }
+
                 const allReviews = await apiGet('/reviews/');
                 const listingReviews = [];
 
@@ -204,17 +214,48 @@
 
         function renderReview(review) {
             const stars = '★'.repeat(review.stars) + '☆'.repeat(5 - review.stars);
+            const isOwner = currentUserId === listingOwnerId;
+            const canRespond = isOwner && !review.owner_response;
+
             return `
                 <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
                     <p>${stars}</p>
                     <p>${review.comment}</p>
-                    ${review.owner_response ? `<p style="margin-left: 20px; color: gray;"><strong>Ответ хозяина:</strong> ${review.owner_response}</p>` : ''}
+                    ${review.owner_response
+                        ? `<p style="margin-left: 20px; color: gray;"><strong>Ответ хозяина:</strong> ${review.owner_response}</p>`
+                        : ''
+                    }
+                    ${canRespond
+                        ? `<div>
+                             <textarea id="response-${review.id}" placeholder="Ваш ответ..."></textarea>
+                             <button type="button" onclick="submitOwnerResponse('${review.id}')">Ответить</button>
+                           </div>`
+                        : ''
+                    }
                 </div>
             `;
         }
 
+        async function submitOwnerResponse(reviewId) {
+            const textarea = document.getElementById(`response-${reviewId}`);
+            const text = textarea.value.trim();
+
+            if (!text) {
+                alert('Введите текст ответа.');
+                return;
+            }
+
+            try {
+                await apiPatch(`/reviews/${reviewId}/response/`, { owner_response: text });
+                await loadReviews();
+            } catch (err) {
+                alert('Не удалось отправить ответ: ' + JSON.stringify(err.data));
+            }
+        }
+
         async function setupReviewForm() {
             if (!isLoggedIn()) return;
+            if (currentUserId === listingOwnerId) return;
 
             try {
                 const myBookings = await apiGet('/bookings/');
@@ -261,9 +302,13 @@
             }
         });
 
-        loadListing();
-        loadReviews();
-        setupReviewForm();
+        async function init() {
+            await loadListing();
+            await loadReviews();
+            await setupReviewForm();
+        }
+
+        init();
     </script>
 </body>
 </html>
