@@ -26,7 +26,7 @@ class ListingListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Listing
         fields = ['id', 'apartment_name', 'country', 'address', 'max_guests', 'parking', 'elevator', 'price_per_night',
-                  'property_type', 'photos', 'owner', 'owner_username']
+                  'property_type', 'photos', 'owner', 'owner_username', 'is_active']
 
 
 class ListingCreateSerializer(serializers.ModelSerializer):
@@ -37,7 +37,7 @@ class ListingCreateSerializer(serializers.ModelSerializer):
             'room_count', 'shower_count', 'toilets_count', 'max_guests', 'input_type',
             'parking', 'can_smoke', 'wifi', 'indoor_fireplace', 'can_pets',
             'facilities_for_guests_with_disabilities', 'air_conditioner', 'elevator',
-            'price_per_night', 'property_type',
+            'price_per_night', 'property_type', 'is_active'
         ]
 
 

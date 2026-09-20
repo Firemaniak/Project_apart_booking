@@ -22,6 +22,9 @@ class PropertyTypeChoices(models.TextChoices):
     house = 'house', _('House')
     room = 'room', _('Room')
 
+class CountryChoices(models.TextChoices):
+    germany = 'DE', _('Germany')
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -35,8 +38,8 @@ class Listing(UniqueID, TimeStampedModel):
                                  verbose_name='address')
     floor = models.PositiveIntegerField(validators=[MinValueValidator(1),MaxValueValidator(165)],
                                  verbose_name='floor')
-    country = models.CharField(max_length=30, validators=[MinLengthValidator(2)],
-                                 verbose_name='country')
+    country = models.CharField(max_length=2, choices=CountryChoices, default=CountryChoices.germany,
+                               verbose_name='country')
     max_guests = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)],
                                                   verbose_name='maximum number of guests')
     room_count = models.PositiveIntegerField(validators=[MinValueValidator(1),MaxValueValidator(20)],
@@ -78,6 +81,8 @@ class Listing(UniqueID, TimeStampedModel):
         max_length=15, choices=PropertyTypeChoices, default=PropertyTypeChoices.apartment,
         verbose_name='property type'
     )
+
+    is_active = models.BooleanField(default=True, verbose_name='is active')
 
     history = HistoricalRecords()
 

@@ -36,19 +36,31 @@
                         ? listing.photos[0].image
                         : null;
                     return `
-                        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+                        <div class="panel">
                             ${photoUrl ? `<img src="${photoUrl}" width="150">` : ''}
-                            <h3>${listing.apartment_name}</h3>
+                            <h3>${listing.apartment_name} ${listing.is_active ? '' : '<span class="muted">(скрыто)</span>'}</h3>
                             <p>${listing.country}, ${listing.address}</p>
                             <p><strong>${listing.price_per_night} €</strong> / сутки</p>
                             <a href="listing-detail.html?id=${listing.id}">Посмотреть</a> |
                             <a href="listing-edit.html?id=${listing.id}">Редактировать</a> |
                             <a href="statistics.html?listing_id=${listing.id}">Статистика</a>
+                            <button type="button" class="secondary" onclick="toggleActive('${listing.id}')">
+                                ${listing.is_active ? 'Скрыть' : 'Показать'}
+                            </button>
                         </div>
                     `;
                 }).join('');
             } catch (err) {
                 container.textContent = 'Не удалось загрузить объявления.';
+            }
+        }
+
+        async function toggleActive(listingId) {
+            try {
+                await apiPatch(`/listings/${listingId}/toggle-active/`, {});
+                await loadMyListings();
+            } catch (err) {
+                alert('Не удалось изменить статус: ' + JSON.stringify(err.data));
             }
         }
     </script>

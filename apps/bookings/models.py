@@ -20,10 +20,18 @@ class PrepaymentTypeChoices(models.TextChoices):
     partial_prepayment = 'partial_prepayment', _('Partial_prepayment')
     full_payment = 'full_payment', _('Full_payment')
 
+
 class PayTypeChoices(models.TextChoices):
     cash = 'cash', _('Cash')
     bank_cart = 'bank_cart', _('Bank_cart')
     kripto = 'kripto', _('Kripto')
+
+
+class BookingStatusChoices(models.TextChoices):
+    pending = 'pending', _('Pending payment')
+    paid = 'paid', _('Paid')
+    cancelled = 'cancelled', _('Cancelled')
+    completed = 'completed', _('Completed')
 
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -43,7 +51,16 @@ class Booking(TimeStampedModel, UniqueID):
     prepayment_type = models.CharField(max_length=20,
                                        choices=PrepaymentTypeChoices, default=PrepaymentTypeChoices.partial_prepayment,
                                   verbose_name='prepayment type')
+    status = models.CharField(max_length=10, choices=BookingStatusChoices, default=BookingStatusChoices.pending)
+
+    card_last4 = models.CharField(max_length=4, blank=True)
+
+    status = models.CharField(max_length=10, choices=BookingStatusChoices, default=BookingStatusChoices.pending)
+
+    card_last4 = models.CharField(max_length=4, blank=True)
+
     guest = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='bookings')  ####ForeignKey HIERRRR---+++++
+
     listing = models.ForeignKey(Listing, on_delete=models.PROTECT, related_name='bookings')  ####ForeignKey HIERRRR---+++++
 
     history = HistoricalRecords()

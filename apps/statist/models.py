@@ -54,3 +54,35 @@ class UserStatistic(UniqueID, TimeStampedModel):
 
     def __str__(self):
         return f'Stats for {self.user.username}'
+
+
+
+
+class SearchHistory(UniqueID, TimeStampedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                             related_name='search_history', null=True, blank=True)
+    keyword = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'search_history'
+        verbose_name = 'Search history entry'
+        verbose_name_plural = 'Search history'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.keyword} ({self.created_at:%d.%m.%Y})'
+
+
+class ListingView(UniqueID, TimeStampedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                             related_name='listing_views', null=True, blank=True)
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='view_history')
+
+    class Meta:
+        db_table = 'listing_views'
+        verbose_name = 'Listing view'
+        verbose_name_plural = 'Listing views'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'View of {self.listing.apartment_name} at {self.created_at:%d.%m.%Y %H:%M}'
