@@ -14,6 +14,7 @@
             <a href="listing-create.html">Создать объявление</a>
             <a href="my-listings.html">Мои объявления</a>
             <a href="my-bookings.html">Мои брони</a>
+            <a href="favorites.html">Избранное</a>
             <a href="profile.html">Профиль</a>
             <button id="logoutBtn" style="display: none;">Выйти</button>
         </div>
@@ -56,6 +57,8 @@
     <script>
         const listingsContainer = document.getElementById('listingsContainer');
         const logoutBtn = document.getElementById('logoutBtn');
+        let favoriteIds = new Map();
+        let currentUserId = null;
 
         if (isLoggedIn()) {
             document.getElementById('navLogin').style.display = 'none';
@@ -87,10 +90,28 @@
             return query ? `?${query}` : '';
         }
 
+        async function loadFavoriteIds() {
+            try {
+                const favorites = await apiGet('/listings/favorites/');
+                const map = new Map();
+                favorites.forEach(function (fav) {
+                    map.set(fav.listing, fav.id);
+                });
+                return map;
+            } catch (err) {
+                return new Map();
+            }
+        }
+
         async function loadListings() {
             listingsContainer.textContent = 'Загрузка...';
             try {
                 const listings = await apiGet(`/listings/${buildQuery()}`);
+                if (isLoggedIn()) {
+                    favoriteIds = await loadFavoriteIds();
+                    const profile = await apiGet('/users/me/');
+                    currentUserId = profile.id;
+                }
                 renderListings(listings);
             } catch (err) {
                 listingsContainer.textContent = 'Не удалось загрузить объявления.';
@@ -111,6 +132,18 @@
                     ? listing.photos[0].image
                     : null;
 
+                const isFavorite = favoriteIds.has(listing.id);
+                const isOwnListing = currentUserId === listing.owner;
+
+                let actionHtml;
+                if (isOwnListing) {
+                    actionHtml = '<span class="muted">Ваше объявление</span>';
+                } else if (isLoggedIn()) {
+                    actionHtml = `<button type="button" class="secondary" onclick="toggleFavorite('${listing.id}', this)">${isFavorite ? '★ В избранном' : '☆ В избранное'}</button>`;
+                } else {
+                    actionHtml = '';
+                }
+
                 const card = document.createElement('div');
                 card.className = 'listing-card';
                 card.innerHTML = `
@@ -122,6 +155,7 @@
                         <span class="price-tag">${listing.price_per_night} € / сутки</span>
                         <div class="actions">
                             <a href="listing-detail.html?id=${listing.id}">Подробнее →</a>
+                            ${actionHtml}
                         </div>
                     </div>
                 `;
@@ -130,6 +164,23 @@
 
             listingsContainer.innerHTML = '';
             listingsContainer.appendChild(grid);
+        }
+
+        async function toggleFavorite(listingId, button) {
+            try {
+                if (favoriteIds.has(listingId)) {
+                    const favId = favoriteIds.get(listingId);
+                    await apiDelete(`/listings/favorites/${favId}/`);
+                    favoriteIds.delete(listingId);
+                    button.textContent = '☆ В избранное';
+                } else {
+                    const favorite = await apiPost('/listings/favorites/', { listing: listingId });
+                    favoriteIds.set(listingId, favorite.id);
+                    button.textContent = '★ В избранном';
+                }
+            } catch (err) {
+                alert('Не удалось изменить избранное: ' + JSON.stringify(err.data));
+            }
         }
 
         document.getElementById('filterForm').addEventListener('submit', function (event) {

@@ -77,6 +77,10 @@ class Listing(UniqueID, TimeStampedModel):
         verbose_name='price per night'
     )
 
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+
     property_type = models.CharField(
         max_length=15, choices=PropertyTypeChoices, default=PropertyTypeChoices.apartment,
         verbose_name='property type'
@@ -115,3 +119,22 @@ class Photo(UniqueID, TimeStampedModel):
         verbose_name = 'Photo'
         verbose_name_plural = 'Photos'
         ordering = ['created_at']
+
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+
+class Favorite(UniqueID, TimeStampedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorites')
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='favorited_by')
+
+    class Meta:
+        db_table = 'favorites'
+        verbose_name = 'Favorite'
+        verbose_name_plural = 'Favorites'
+        unique_together = ('user', 'listing')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.user.username} → {self.listing.apartment_name}'

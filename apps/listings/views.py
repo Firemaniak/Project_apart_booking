@@ -4,8 +4,8 @@ from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework import generics, permissions
 
 from apps.core.permissions import IsOwnerOrReadOnly
-from .models import Listing, Photo
-from .serializers import ListingListSerializer, ListingCreateSerializer, PhotoSerializer
+from .models import Listing, Photo, Favorite
+from .serializers import ListingListSerializer, ListingCreateSerializer, PhotoSerializer, FavoriteSerializer
 from rest_framework.response import Response
 from django.db.models import Q
 
@@ -135,3 +135,28 @@ class ListingToggleActiveView(generics.UpdateAPIView):
         listing.is_active = not listing.is_active
         listing.save()
         return Response({'is_active': listing.is_active})
+
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+
+class FavoriteListCreateView(generics.ListCreateAPIView):
+    serializer_class = FavoriteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Favorite.objects.none()
+        return Favorite.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class FavoriteDeleteView(generics.DestroyAPIView):
+    serializer_class = FavoriteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Favorite.objects.filter(user=self.request.user)

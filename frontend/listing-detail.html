@@ -5,11 +5,14 @@
     <link rel="stylesheet" href="css/style.css">
     <title>Объявление</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
     <p><a href="index.html">← Назад к каталогу</a></p>
 
     <div id="listingContainer">Загрузка...</div>
+
+    <div id="mapContainer" style="height: 300px; margin: 1rem 0; display: none;"></div>
 
     <hr>
 
@@ -65,6 +68,7 @@
 
     <script src="js/api.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const params = new URLSearchParams(window.location.search);
         const listingId = params.get('id');
@@ -125,6 +129,21 @@
                 <p><strong>${listing.price_per_night} €</strong> / сутки</p>
                 <p>Хозяин: <a href="user-profile.html?id=${listing.owner}">${listing.owner_username}</a></p>
             `;
+
+            if (listing.latitude && listing.longitude) {
+                showMap(parseFloat(listing.latitude), parseFloat(listing.longitude), listing.apartment_name);
+            }
+        }
+
+        function showMap(lat, lon, title) {
+            const mapContainer = document.getElementById('mapContainer');
+            mapContainer.style.display = 'block';
+
+            const map = L.map('mapContainer').setView([lat, lon], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+            }).addTo(map);
+            L.marker([lat, lon]).addTo(map).bindPopup(title);
         }
 
         async function loadBookedDates() {

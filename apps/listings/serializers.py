@@ -1,4 +1,4 @@
-from .models import Listing, Photo
+from .models import Listing, Photo, Favorite
 from rest_framework import serializers
 from django.utils import timezone
 
@@ -26,7 +26,7 @@ class ListingListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Listing
         fields = ['id', 'apartment_name', 'country', 'address', 'max_guests', 'parking', 'elevator', 'price_per_night',
-                  'property_type', 'photos', 'owner', 'owner_username', 'is_active']
+                  'property_type', 'photos', 'owner', 'owner_username', 'is_active', 'latitude', 'longitude']
 
 
 class ListingCreateSerializer(serializers.ModelSerializer):
@@ -37,7 +37,7 @@ class ListingCreateSerializer(serializers.ModelSerializer):
             'room_count', 'shower_count', 'toilets_count', 'max_guests', 'input_type',
             'parking', 'can_smoke', 'wifi', 'indoor_fireplace', 'can_pets',
             'facilities_for_guests_with_disabilities', 'air_conditioner', 'elevator',
-            'price_per_night', 'property_type', 'is_active'
+            'price_per_night', 'property_type', 'is_active', 'latitude', 'longitude'
         ]
 
 
@@ -46,5 +46,8 @@ class ListingCreateSerializer(serializers.ModelSerializer):
 
 
 
-
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = ['id', 'listing', 'created_at']
 

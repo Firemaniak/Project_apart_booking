@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Избранное</title>
+</head>
+<body>
+    <p><a href="index.html">← Назад к каталогу</a></p>
+    <h1>Избранное</h1>
+
+    <p id="authWarning" style="display: none; color: red;">
+        Нужно <a href="login.html">войти</a>, чтобы увидеть избранное.
+    </p>
+
+    <div id="favoritesContainer"></div>
+
+    <script src="js/api.js"></script>
+    <script>
+        if (!isLoggedIn()) {
+            document.getElementById('authWarning').style.display = 'block';
+        } else {
+            loadFavorites();
+        }
+
+        async function loadFavorites() {
+            const container = document.getElementById('favoritesContainer');
+            try {
+                const favorites = await apiGet('/listings/favorites/');
+
+                if (favorites.length === 0) {
+                    container.innerHTML = '<p class="empty-state">В избранном пока пусто.</p>';
+                    return;
+                }
+
+                const listings = await Promise.all(
+                    favorites.map(async function (fav) {
+                        const listing = await apiGet(`/listings/${fav.listing}/`);
+                        return { favoriteId: fav.id, listing };
+                    })
+                );
+
+                const grid = document.createElement('div');
+                grid.className = 'listing-grid';
+
+                listings.forEach(function ({ favoriteId, listing }) {
+                    const photoUrl = listing.photos && listing.photos.length > 0
+                        ? listing.photos[0].image
+                        : null;
+
+                    const card = document.createElement('div');
+                    card.className = 'listing-card';
+                    card.innerHTML = `
+                        ${photoUrl ? `<img src="${photoUrl}" alt="${listing.apartment_name}">` : ''}
+                        <div class="body">
+                            <h3>${listing.apartment_name}</h3>
+                            <p class="location">${listing.country}, ${listing.address}</p>
+                            <span class="price-tag">${listing.price_per_night} € / сутки</span>
+                            <div class="actions">
+                                <a href="listing-detail.html?id=${listing.id}">Подробнее →</a>
+                                <button type="button" class="secondary" onclick="removeFavorite('${favoriteId}')">Убрать</button>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                container.innerHTML = '';
+                container.appendChild(grid);
+            } catch (err) {
+                container.textContent = 'Не удалось загрузить избранное.';
+            }
+        }
+
+        async function removeFavorite(favoriteId) {
+            try {
+                await apiDelete(`/listings/favorites/${favoriteId}/`);
+                await loadFavorites();
+            } catch (err) {
+                alert('Не удалось убрать из избранного: ' + JSON.stringify(err.data));
+            }
+        }
+    </script>
+</body>
+</html>
