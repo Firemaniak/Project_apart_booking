@@ -169,15 +169,17 @@
             const guestsCount = parseInt(document.getElementById('guestsCount').value);
 
             try {
-                await apiPost('/bookings/', {
+                const booking = await apiPost('/bookings/', {
                     listing: listingId,
                     start_date: startDate,
                     end_date: endDate,
                     guests_count: guestsCount,
                 });
                 bookingMessage.style.color = 'green';
-                bookingMessage.textContent = 'Бронь успешно создана!';
-                await loadBookedDates();
+                bookingMessage.textContent = 'Бронь создана! Переход к оплате...';
+                setTimeout(function () {
+                    window.location.href = `booking-payment.html?booking_id=${booking.id}`;
+                }, 1000);
             } catch (err) {
                 bookingMessage.style.color = 'red';
                 bookingMessage.textContent = JSON.stringify(err.data);

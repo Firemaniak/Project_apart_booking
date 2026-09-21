@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Оплата брони</title>
+</head>
+<body>
+    <p><a href="my-bookings.html">← Назад к моим броням</a></p>
+    <h1>Оплата бронирования</h1>
+
+    <div id="bookingSummary">Загрузка...</div>
+
+    <form id="paymentForm">
+        <div>
+            <label>Имя и фамилия владельца карты</label>
+            <input type="text" id="cardholderName" required>
+        </div>
+        <div>
+            <label>Номер карты</label>
+            <input type="text" id="cardNumber" placeholder="4111 1111 1111 1111" required maxlength="19">
+        </div>
+        <div>
+            <label>Срок действия (MM/YY)</label>
+            <input type="text" id="expiryDate" placeholder="12/28" required maxlength="5">
+        </div>
+        <div>
+            <label>CVV</label>
+            <input type="text" id="cvv" placeholder="123" required maxlength="4">
+        </div>
+        <button type="submit">Оплатить</button>
+    </form>
+
+    <p id="paymentMessage"></p>
+
+    <script src="js/api.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const bookingId = params.get('booking_id');
+
+        async function loadBooking() {
+            const summary = document.getElementById('bookingSummary');
+            try {
+                const booking = await apiGet(`/bookings/${bookingId}/`);
+                const start = new Date(booking.start_date).toLocaleDateString();
+                const end = new Date(booking.end_date).toLocaleDateString();
+                summary.innerHTML = `
+                    <div class="panel">
+                        <p>Даты: ${start} — ${end}</p>
+                        <p>К оплате: <strong>${booking.price} €</strong></p>
+                        <p>Статус: ${booking.status}</p>
+                    </div>
+                `;
+
+                if (booking.status !== 'pending') {
+                    document.getElementById('paymentForm').style.display = 'none';
+                    document.getElementById('paymentMessage').textContent =
+                        booking.status === 'paid' ? 'Эта бронь уже оплачена.' : `Статус брони: ${booking.status}`;
+                }
+            } catch (err) {
+                summary.textContent = 'Не удалось загрузить бронь.';
+            }
+        }
+
+        document.getElementById('cardNumber').addEventListener('input', function (e) {
+            let digits = e.target.value.replace(/\D/g, '').slice(0, 16);
+            e.target.value = digits.replace(/(.{4})/g, '$1 ').trim();
+        });
+
+        document.getElementById('expiryDate').addEventListener('input', function (e) {
+            let digits = e.target.value.replace(/\D/g, '').slice(0, 4);
+            if (digits.length >= 3) {
+                e.target.value = digits.slice(0, 2) + '/' + digits.slice(2);
+            } else {
+                e.target.value = digits;
+            }
+        });
+
+        document.getElementById('paymentForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const message = document.getElementById('paymentMessage');
+
+            const payload = {
+                cardholder_name: document.getElementById('cardholderName').value,
+                card_number: document.getElementById('cardNumber').value,
+                expiry_date: document.getElementById('expiryDate').value,
+                cvv: document.getElementById('cvv').value,
+            };
+
+            try {
+                const result = await apiPost(`/bookings/${bookingId}/pay/`, payload);
+                message.style.color = 'green';
+                message.textContent = `${result.message} (карта ****${result.card_last4})`;
+                document.getElementById('paymentForm').style.display = 'none';
+            } catch (err) {
+                message.style.color = 'red';
+                message.textContent = JSON.stringify(err.data);
+            }
+        });
+
+        loadBooking();
+    </script>
+</body>
+</html>

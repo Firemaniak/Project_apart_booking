@@ -15,10 +15,10 @@ from simple_history.models import HistoricalRecords
 #-----------------------------------------------------------------------------------------------------------------------
 
 
-class PrepaymentTypeChoices(models.TextChoices):
-    free_booking = 'free_booking', _('Free_booking')
-    partial_prepayment = 'partial_prepayment', _('Partial_prepayment')
-    full_payment = 'full_payment', _('Full_payment')
+# class PrepaymentTypeChoices(models.TextChoices):
+#     free_booking = 'free_booking', _('Free_booking')
+#     partial_prepayment = 'partial_prepayment', _('Partial_prepayment')
+#     full_payment = 'full_payment', _('Full_payment')
 
 
 class PayTypeChoices(models.TextChoices):
@@ -48,9 +48,9 @@ class Booking(TimeStampedModel, UniqueID):
     payment_type = models.CharField(max_length=10,
                                     choices=PayTypeChoices, default=PayTypeChoices.bank_cart,
                                   verbose_name='payment type')
-    prepayment_type = models.CharField(max_length=20,
-                                       choices=PrepaymentTypeChoices, default=PrepaymentTypeChoices.partial_prepayment,
-                                  verbose_name='prepayment type')
+    # prepayment_type = models.CharField(max_length=20,
+    #                                    choices=PrepaymentTypeChoices, default=PrepaymentTypeChoices.partial_prepayment,
+    #                               verbose_name='prepayment type')
     status = models.CharField(max_length=10, choices=BookingStatusChoices, default=BookingStatusChoices.pending)
 
     card_last4 = models.CharField(max_length=4, blank=True)

@@ -59,20 +59,22 @@
         }
 
         function renderBooking(booking) {
-    const start = new Date(booking.start_date).toLocaleDateString();
-    const end = new Date(booking.end_date).toLocaleDateString();
-    const isPast = new Date(booking.end_date) < new Date();
+            const start = new Date(booking.start_date).toLocaleDateString();
+            const end = new Date(booking.end_date).toLocaleDateString();
+            const isPast = new Date(booking.end_date) < new Date();
 
-    return `
-        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
-            <p>${start} — ${end} ${isPast ? '<em>(завершена)</em>' : ''}</p>
-            <p>Гостей: ${booking.guests_count}</p>
-            <p>Цена: ${booking.price} €</p>
-            <a href="listing-detail.html?id=${booking.listing}">Объявление</a>
-            ${!isPast ? `<button onclick="cancelBooking('${booking.id}')">Отменить</button>` : ''}
-        </div>
-    `;
-}
+            return `
+                <div class="panel">
+                    <p>${start} — ${end} ${isPast ? '<em>(завершена)</em>' : ''}</p>
+                    <p>Гостей: ${booking.guests_count}</p>
+                    <p>Цена: ${booking.price} €</p>
+                    <p>Статус: ${booking.status}</p>
+                    <a href="listing-detail.html?id=${booking.listing}">Объявление</a>
+                    ${booking.status === 'pending' ? `<a href="booking-payment.html?booking_id=${booking.id}">Оплатить</a>` : ''}
+                    ${!isPast ? `<button onclick="cancelBooking('${booking.id}')">Отменить</button>` : ''}
+                </div>
+            `;
+        }
 
         async function cancelBooking(bookingId) {
             if (!confirm('Точно отменить бронь?')) return;
