@@ -8,65 +8,75 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
-    <p><a href="index.html">← Назад к каталогу</a></p>
+    <div style="text-align: right; padding: 0.5rem 1rem;">
+        <select id="languageSelect" onchange="setLanguage(this.value)">
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+            <option value="uk">UA</option>
+        </select>
+    </div>
 
-    <div id="listingContainer">Загрузка...</div>
+    <p><a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a></p>
+
+    <div id="listingContainer" data-i18n="loading">Загрузка...</div>
 
     <div id="mapContainer" style="height: 300px; margin: 1rem 0; display: none;"></div>
 
     <hr>
 
     <div id="bookingSection" style="display: none;">
-        <h2>Забронировать</h2>
+        <h2 data-i18n="book_now_title">Забронировать</h2>
         <form id="bookingForm">
             <div>
-                <label>Даты:</label>
+                <label data-i18n="dates_label">Даты:</label>
                 <input type="text" id="dateRange" placeholder="Выберите даты" readonly>
             </div>
             <div>
-                <label>Количество гостей:</label>
+                <label data-i18n="guests_count_label">Количество гостей:</label>
                 <input type="number" id="guestsCount" min="1" value="1" required>
             </div>
-            <button type="submit">Забронировать</button>
+            <button type="submit" data-i18n="book_btn">Забронировать</button>
         </form>
         <p id="bookingMessage"></p>
     </div>
 
     <p id="loginPrompt" style="display: none;">
-        <a href="login.html">Войдите</a>, чтобы забронировать это жильё.
+        <a href="login.html" data-i18n="login_link">Войдите</a>, <span data-i18n="need_login_book_suffix">чтобы забронировать это жильё.</span>
     </p>
 
     <hr>
-    <h2>Отзывы</h2>
-    <div id="reviewsContainer">Загрузка...</div>
+    <h2 data-i18n="reviews_title">Отзывы</h2>
+    <div id="reviewsContainer" data-i18n="loading">Загрузка...</div>
 
     <div id="reviewFormSection" style="display: none;">
-        <h3>Оставить отзыв</h3>
+        <h3 data-i18n="leave_review_title">Оставить отзыв</h3>
         <form id="reviewForm">
             <div>
-                <label>Бронь:</label>
+                <label data-i18n="booking_label">Бронь:</label>
                 <select id="reviewBookingSelect"></select>
             </div>
             <div>
-                <label>Оценка:</label>
+                <label data-i18n="rating_label">Оценка:</label>
                 <select id="reviewStars">
-                    <option value="5">5 - отлично</option>
-                    <option value="4">4 - хорошо</option>
-                    <option value="3">3 - нормально</option>
-                    <option value="2">2 - плохо</option>
-                    <option value="1">1 - ужасно</option>
+                    <option value="5" data-i18n="rating_5">5 - отлично</option>
+                    <option value="4" data-i18n="rating_4">4 - хорошо</option>
+                    <option value="3" data-i18n="rating_3">3 - нормально</option>
+                    <option value="2" data-i18n="rating_2">2 - плохо</option>
+                    <option value="1" data-i18n="rating_1">1 - ужасно</option>
                 </select>
             </div>
             <div>
-                <label>Комментарий:</label>
+                <label data-i18n="comment_label">Комментарий:</label>
                 <textarea id="reviewComment" required minlength="10"></textarea>
             </div>
-            <button type="submit">Отправить отзыв</button>
+            <button type="submit" data-i18n="submit_review_btn">Отправить отзыв</button>
         </form>
         <p id="reviewMessage"></p>
     </div>
 
     <script src="js/api.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -91,7 +101,7 @@
                 await loadBookedDates();
                 await checkOwnership(listing);
             } catch (err) {
-                listingContainer.textContent = 'Не удалось загрузить объявление.';
+                listingContainer.textContent = t('listing_load_error');
             }
         }
 
@@ -105,7 +115,7 @@
                     loginPrompt.style.display = 'none';
 
                     const ownerNotice = document.createElement('p');
-                    ownerNotice.textContent = 'Это ваше собственное объявление — забронировать его нельзя.';
+                    ownerNotice.textContent = t('own_listing_notice');
                     ownerNotice.style.color = 'gray';
                     document.body.insertBefore(ownerNotice, bookingSection);
                 }
@@ -123,11 +133,11 @@
 
             listingContainer.innerHTML = `
                 <h1>${listing.apartment_name}</h1>
-                <div>${photosHtml || '<p>Нет фото</p>'}</div>
+                <div>${photosHtml || `<p>${t('no_photos')}</p>`}</div>
                 <p>${listing.country}, ${listing.address}</p>
-                <p>До ${listing.max_guests} гостей</p>
-                <p><strong>${listing.price_per_night} €</strong> / сутки</p>
-                <p>Хозяин: <a href="user-profile.html?id=${listing.owner}">${listing.owner_username}</a></p>
+                <p>${t('guests_up_to')} ${listing.max_guests} ${t('guests_word')}</p>
+                <p><strong>${listing.price_per_night} €</strong> ${t('per_night')}</p>
+                <p>${t('host_label')}: <a href="user-profile.html?id=${listing.owner}">${listing.owner_username}</a></p>
             `;
 
             if (listing.latitude && listing.longitude) {
@@ -160,7 +170,6 @@
             });
         }
 
-        // Показываем форму бронирования только залогиненным
         if (isLoggedIn()) {
             bookingSection.style.display = 'block';
         } else {
@@ -173,7 +182,7 @@
 
             const selectedDates = calendar.selectedDates;
             if (selectedDates.length < 2) {
-                bookingMessage.textContent = 'Выберите дату заезда и выезда.';
+                bookingMessage.textContent = t('select_dates_prompt');
                 return;
             }
 
@@ -195,7 +204,7 @@
                     guests_count: guestsCount,
                 });
                 bookingMessage.style.color = 'green';
-                bookingMessage.textContent = 'Бронь создана! Переход к оплате...';
+                bookingMessage.textContent = t('booking_created_redirect');
                 setTimeout(function () {
                     window.location.href = `booking-payment.html?booking_id=${booking.id}`;
                 }, 1000);
@@ -224,12 +233,12 @@
                 }
 
                 if (listingReviews.length === 0) {
-                    container.textContent = 'Отзывов пока нет.';
+                    container.textContent = t('no_reviews_yet');
                 } else {
                     container.innerHTML = listingReviews.map(renderReview).join('');
                 }
             } catch (err) {
-                container.textContent = 'Не удалось загрузить отзывы.';
+                container.textContent = t('reviews_load_error');
             }
         }
 
@@ -243,13 +252,13 @@
                     <p>${stars}</p>
                     <p>${review.comment}</p>
                     ${review.owner_response
-                        ? `<p style="margin-left: 20px; color: gray;"><strong>Ответ хозяина:</strong> ${review.owner_response}</p>`
+                        ? `<p style="margin-left: 20px; color: gray;"><strong>${t('owner_response_label')}:</strong> ${review.owner_response}</p>`
                         : ''
                     }
                     ${canRespond
                         ? `<div>
-                             <textarea id="response-${review.id}" placeholder="Ваш ответ..."></textarea>
-                             <button type="button" onclick="submitOwnerResponse('${review.id}')">Ответить</button>
+                             <textarea id="response-${review.id}" placeholder="${t('your_response_placeholder')}"></textarea>
+                             <button type="button" onclick="submitOwnerResponse('${review.id}')">${t('respond_btn')}</button>
                            </div>`
                         : ''
                     }
@@ -262,7 +271,7 @@
             const text = textarea.value.trim();
 
             if (!text) {
-                alert('Введите текст ответа.');
+                alert(t('enter_response_prompt'));
                 return;
             }
 
@@ -270,7 +279,7 @@
                 await apiPatch(`/reviews/${reviewId}/response/`, { owner_response: text });
                 await loadReviews();
             } catch (err) {
-                alert('Не удалось отправить ответ: ' + JSON.stringify(err.data));
+                alert(t('response_send_error') + ': ' + JSON.stringify(err.data));
             }
         }
 
@@ -314,7 +323,7 @@
             try {
                 await apiPost('/reviews/', payload);
                 message.style.color = 'green';
-                message.textContent = 'Отзыв отправлен!';
+                message.textContent = t('review_sent');
                 document.getElementById('reviewForm').reset();
                 await loadReviews();
             } catch (err) {

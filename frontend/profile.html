@@ -6,37 +6,47 @@
     <title>Мой профиль</title>
 </head>
 <body>
-    <p><a href="index.html">← Назад к каталогу</a></p>
-    <h1>Мой профиль</h1>
+    <div style="text-align: right; padding: 0.5rem 1rem;">
+        <select id="languageSelect" onchange="setLanguage(this.value)">
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+            <option value="uk">UA</option>
+        </select>
+    </div>
+
+    <p><a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a></p>
+    <h1 data-i18n="profile_title">Мой профиль</h1>
 
     <p id="authWarning" style="display: none; color: red;">
-        Нужно <a href="login.html">войти</a>, чтобы увидеть профиль.
+        <span data-i18n="need_login_prefix">Нужно</span> <a href="login.html" data-i18n="login_link">войти</a>, <span data-i18n="need_login_profile_suffix">чтобы увидеть профиль.</span>
     </p>
 
     <div id="profileContent" style="display: none;">
-        <h2>Статистика</h2>
-        <p>Заработано: <span id="totalEarned"></span> €</p>
-        <p>Потрачено: <span id="totalSpent"></span> €</p>
-        <p>Объявлений: <span id="listingCount"></span></p>
-        <p>Броней: <span id="bookingCount"></span></p>
-        <p>Средний рейтинг как хозяин: <span id="starsCount"></span></p>
+        <h2 data-i18n="stats_title">Статистика</h2>
+        <p><span data-i18n="total_earned_label">Заработано:</span> <span id="totalEarned"></span> €</p>
+        <p><span data-i18n="total_spent_label">Потрачено:</span> <span id="totalSpent"></span> €</p>
+        <p><span data-i18n="listing_count_label">Объявлений:</span> <span id="listingCount"></span></p>
+        <p><span data-i18n="booking_count_label">Броней:</span> <span id="bookingCount"></span></p>
+        <p><span data-i18n="avg_rating_label">Средний рейтинг как хозяин:</span> <span id="starsCount"></span></p>
 
-        <h2>Данные профиля</h2>
+        <h2 data-i18n="profile_data_title">Данные профиля</h2>
         <form id="profileForm">
             <div><label>Username:</label> <span id="usernameDisplay"></span></div>
-            <div><label>Email:</label><input type="email" id="email" required></div>
-            <div><label>Имя:</label><input type="text" id="firstName"></div>
-            <div><label>Фамилия:</label><input type="text" id="lastName"></div>
-            <div><label>Дата рождения:</label><input type="date" id="birthDate"></div>
-            <div><label>О себе:</label><textarea id="bio"></textarea></div>
-            <div><label>Адрес:</label><input type="text" id="address" required></div>
-            <div><label>Телефон:</label><input type="tel" id="phone"></div>
-            <button type="submit">Сохранить</button>
+            <div><label data-i18n="email_label">Email:</label><input type="email" id="email" required></div>
+            <div><label data-i18n="first_name_label">Имя:</label><input type="text" id="firstName"></div>
+            <div><label data-i18n="last_name_label">Фамилия:</label><input type="text" id="lastName"></div>
+            <div><label data-i18n="birth_date_label">Дата рождения:</label><input type="date" id="birthDate"></div>
+            <div><label data-i18n="bio_label">О себе:</label><textarea id="bio"></textarea></div>
+            <div><label data-i18n="address_label">Адрес:</label><input type="text" id="address" required></div>
+            <div><label data-i18n="phone_label">Телефон:</label><input type="tel" id="phone"></div>
+            <button type="submit" data-i18n="save_btn">Сохранить</button>
         </form>
         <p id="message"></p>
     </div>
 
     <script src="js/api.js"></script>
+    <script src="js/i18n.js"></script>
     <script>
         if (!isLoggedIn()) {
             document.getElementById('authWarning').style.display = 'block';
@@ -50,7 +60,7 @@
                 fillProfile(profile);
                 document.getElementById('profileContent').style.display = 'block';
             } catch (err) {
-                document.getElementById('authWarning').textContent = 'Не удалось загрузить профиль.';
+                document.getElementById('authWarning').textContent = t('profile_load_error');
                 document.getElementById('authWarning').style.display = 'block';
             }
         }
@@ -60,7 +70,7 @@
             document.getElementById('totalSpent').textContent = profile.total_spent;
             document.getElementById('listingCount').textContent = profile.listing_count;
             document.getElementById('bookingCount').textContent = profile.booking_count;
-            document.getElementById('starsCount').textContent = profile.stars_count ?? 'нет отзывов';
+            document.getElementById('starsCount').textContent = profile.stars_count ?? t('no_reviews');
 
             document.getElementById('usernameDisplay').textContent = profile.username;
             document.getElementById('email').value = profile.email;
@@ -91,7 +101,7 @@
             try {
                 await apiPatch('/users/me/', payload);
                 message.style.color = 'green';
-                message.textContent = 'Профиль обновлён!';
+                message.textContent = t('profile_saved');
             } catch (err) {
                 message.style.color = 'red';
                 message.textContent = JSON.stringify(err.data);

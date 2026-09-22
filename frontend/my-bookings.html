@@ -6,20 +6,30 @@
     <title>Мои брони</title>
 </head>
 <body>
-    <p><a href="index.html">← Назад к каталогу</a></p>
-    <h1>Мои брони</h1>
+    <div style="text-align: right; padding: 0.5rem 1rem;">
+        <select id="languageSelect" onchange="setLanguage(this.value)">
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+            <option value="uk">UA</option>
+        </select>
+    </div>
+
+    <p><a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a></p>
+    <h1 data-i18n="my_bookings_title">Мои брони</h1>
 
     <p id="authWarning" style="display: none; color: red;">
-        Нужно <a href="login.html">войти</a>, чтобы увидеть свои брони.
+        <span data-i18n="need_login_prefix">Нужно</span> <a href="login.html" data-i18n="login_link">войти</a>, <span data-i18n="need_login_my_bookings_suffix">чтобы увидеть свои брони.</span>
     </p>
 
-    <h2>Я бронировал(а)</h2>
+    <h2 data-i18n="as_guest_title">Я бронировал(а)</h2>
     <div id="asGuestContainer"></div>
 
-    <h2>Брони на мои объявления</h2>
+    <h2 data-i18n="as_owner_title">Брони на мои объявления</h2>
     <div id="asOwnerContainer"></div>
 
     <script src="js/api.js"></script>
+    <script src="js/i18n.js"></script>
     <script>
         let currentUserId = null;
 
@@ -47,14 +57,14 @@
 
                 asGuestContainer.innerHTML = asGuest.length
                     ? asGuest.map(renderBooking).join('')
-                    : '<p>Вы пока ничего не бронировали.</p>';
+                    : `<p>${t('no_bookings_as_guest')}</p>`;
 
                 asOwnerContainer.innerHTML = asOwner.length
                     ? asOwner.map(renderBooking).join('')
-                    : '<p>На ваши объявления пока нет броней.</p>';
+                    : `<p>${t('no_bookings_as_owner')}</p>`;
 
             } catch (err) {
-                asGuestContainer.textContent = 'Не удалось загрузить брони.';
+                asGuestContainer.textContent = t('bookings_load_error');
             }
         }
 
@@ -65,24 +75,24 @@
 
             return `
                 <div class="panel">
-                    <p>${start} — ${end} ${isPast ? '<em>(завершена)</em>' : ''}</p>
-                    <p>Гостей: ${booking.guests_count}</p>
-                    <p>Цена: ${booking.price} €</p>
-                    <p>Статус: ${booking.status}</p>
-                    <a href="listing-detail.html?id=${booking.listing}">Объявление</a>
-                    ${booking.status === 'pending' ? `<a href="booking-payment.html?booking_id=${booking.id}">Оплатить</a>` : ''}
-                    ${!isPast ? `<button onclick="cancelBooking('${booking.id}')">Отменить</button>` : ''}
+                    <p>${start} — ${end} ${isPast ? `<em>(${t('completed_label')})</em>` : ''}</p>
+                    <p>${t('guests_word_capitalized')}: ${booking.guests_count}</p>
+                    <p>${t('price_label')}: ${booking.price} €</p>
+                    <p>${t('status_label')}: ${booking.status}</p>
+                    <a href="listing-detail.html?id=${booking.listing}">${t('listing_link')}</a>
+                    ${booking.status === 'pending' ? `<a href="booking-payment.html?booking_id=${booking.id}">${t('pay_btn')}</a>` : ''}
+                    ${!isPast ? `<button onclick="cancelBooking('${booking.id}')">${t('cancel_btn')}</button>` : ''}
                 </div>
             `;
         }
 
         async function cancelBooking(bookingId) {
-            if (!confirm('Точно отменить бронь?')) return;
+            if (!confirm(t('cancel_confirm'))) return;
             try {
                 await apiDelete(`/bookings/${bookingId}/`);
                 await loadMyBookings();
             } catch (err) {
-                alert('Не удалось отменить: ' + JSON.stringify(err.data));
+                alert(t('cancel_error') + ': ' + JSON.stringify(err.data));
             }
         }
     </script>

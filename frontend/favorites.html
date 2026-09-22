@@ -6,16 +6,26 @@
     <title>Избранное</title>
 </head>
 <body>
-    <p><a href="index.html">← Назад к каталогу</a></p>
-    <h1>Избранное</h1>
+    <div style="text-align: right; padding: 0.5rem 1rem;">
+        <select id="languageSelect" onchange="setLanguage(this.value)">
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+            <option value="uk">UA</option>
+        </select>
+    </div>
+
+    <p><a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a></p>
+    <h1 data-i18n="favorites_title">Избранное</h1>
 
     <p id="authWarning" style="display: none; color: red;">
-        Нужно <a href="login.html">войти</a>, чтобы увидеть избранное.
+        <span data-i18n="need_login_prefix">Нужно</span> <a href="login.html" data-i18n="login_link">войти</a>, <span data-i18n="need_login_favorites_suffix">чтобы увидеть избранное.</span>
     </p>
 
     <div id="favoritesContainer"></div>
 
     <script src="js/api.js"></script>
+    <script src="js/i18n.js"></script>
     <script>
         if (!isLoggedIn()) {
             document.getElementById('authWarning').style.display = 'block';
@@ -29,7 +39,7 @@
                 const favorites = await apiGet('/listings/favorites/');
 
                 if (favorites.length === 0) {
-                    container.innerHTML = '<p class="empty-state">В избранном пока пусто.</p>';
+                    container.innerHTML = `<p class="empty-state">${t('favorites_empty')}</p>`;
                     return;
                 }
 
@@ -55,10 +65,10 @@
                         <div class="body">
                             <h3>${listing.apartment_name}</h3>
                             <p class="location">${listing.country}, ${listing.address}</p>
-                            <span class="price-tag">${listing.price_per_night} € / сутки</span>
+                            <span class="price-tag">${listing.price_per_night} € ${t('per_night')}</span>
                             <div class="actions">
-                                <a href="listing-detail.html?id=${listing.id}">Подробнее →</a>
-                                <button type="button" class="secondary" onclick="removeFavorite('${favoriteId}')">Убрать</button>
+                                <a href="listing-detail.html?id=${listing.id}">${t('more_details')}</a>
+                                <button type="button" class="secondary" onclick="removeFavorite('${favoriteId}')">${t('remove_btn')}</button>
                             </div>
                         </div>
                     `;
@@ -68,7 +78,7 @@
                 container.innerHTML = '';
                 container.appendChild(grid);
             } catch (err) {
-                container.textContent = 'Не удалось загрузить избранное.';
+                container.textContent = t('favorites_load_error');
             }
         }
 
@@ -77,7 +87,7 @@
                 await apiDelete(`/listings/favorites/${favoriteId}/`);
                 await loadFavorites();
             } catch (err) {
-                alert('Не удалось убрать из избранного: ' + JSON.stringify(err.data));
+                alert(t('favorites_remove_error') + ': ' + JSON.stringify(err.data));
             }
         }
     </script>

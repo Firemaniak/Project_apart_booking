@@ -6,23 +6,33 @@
     <title>Вход</title>
 </head>
 <body>
-    <h1>Вход в аккаунт</h1>
+    <div style="text-align: right; padding: 0.5rem 1rem;">
+        <select id="languageSelect" onchange="setLanguage(this.value)">
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+            <option value="uk">UA</option>
+        </select>
+    </div>
+
+    <h1 data-i18n="login_title">Вход в аккаунт</h1>
 
     <form id="loginForm">
         <div>
-            <label>Email:</label>
+            <label data-i18n="email_label">Email:</label>
             <input type="email" id="email" required>
         </div>
         <div>
-            <label>Пароль:</label>
+            <label data-i18n="password_label">Пароль:</label>
             <input type="password" id="password" required>
         </div>
-        <button type="submit">Войти</button>
+        <button type="submit" data-i18n="login_btn">Войти</button>
     </form>
 
     <p id="errorMessage" style="color: red;"></p>
 
     <script src="js/api.js"></script>
+    <script src="js/i18n.js"></script>
     <script>
         const form = document.getElementById('loginForm');
         const errorMessage = document.getElementById('errorMessage');
@@ -41,7 +51,7 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Неверный email или пароль');
+                    throw new Error(t('login_error'));
                 }
 
                 const data = await response.json();

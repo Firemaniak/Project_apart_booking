@@ -1,5 +1,6 @@
 from django.db import models
 
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, MinLengthValidator
 from django.conf import settings
@@ -20,7 +21,7 @@ class InputTypeChoices(models.TextChoices):
 class PropertyTypeChoices(models.TextChoices):
     apartment = 'apartment', _('Apartment')
     house = 'house', _('House')
-    room = 'room', _('Room')
+    studio = 'studio', _('Studio')
 
 class CountryChoices(models.TextChoices):
     germany = 'DE', _('Germany')
@@ -36,12 +37,14 @@ class Listing(UniqueID, TimeStampedModel):
                                    verbose_name='description')
     address = models.CharField(max_length=60, validators=[MinLengthValidator(5)],
                                  verbose_name='address')
-    floor = models.PositiveIntegerField(validators=[MinValueValidator(1),MaxValueValidator(165)],
+    floor = models.PositiveIntegerField(validators=[MinValueValidator(1),MaxValueValidator(165)],null=True, blank=True,
                                  verbose_name='floor')
     country = models.CharField(max_length=2, choices=CountryChoices, default=CountryChoices.germany,
                                verbose_name='country')
     max_guests = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)],
                                                   verbose_name='maximum number of guests')
+    floors_count = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)],
+        null=True, blank=True, verbose_name='number of floors')
     room_count = models.PositiveIntegerField(validators=[MinValueValidator(1),MaxValueValidator(20)],
                                  verbose_name='number of rooms')
     shower_count = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)],
@@ -52,6 +55,7 @@ class Listing(UniqueID, TimeStampedModel):
                                   verbose_name='how to get in')
     parking = models.BooleanField(default=False,
                                   verbose_name='availability of parking')
+
     can_smoke = models.BooleanField(default=False,
                                     verbose_name='Is smoking allowed?')
     wifi = models.BooleanField(default=False,
@@ -102,6 +106,15 @@ class Listing(UniqueID, TimeStampedModel):
             models.Index(fields=['country']),
             models.Index(fields=['price_per_night']),
         ]
+
+    def clean(self):
+        super().clean()
+        if self.property_type == PropertyTypeChoices.house:
+            if self.floors_count is None:
+                raise ValidationError({'floors_count': 'This field is required for houses.'})
+        else:
+            if self.floor is None:
+                raise ValidationError({'floor': 'This field is required for apartments and rooms.'})
 
 
 #-----------------------------------------------------------------------------------------------------------------------

@@ -9,51 +9,58 @@
     <nav class="site-nav">
         <a href="index.html" class="brand">Nestwell</a>
         <div class="links">
-            <a href="login.html" id="navLogin">Войти</a>
-            <a href="register.html" id="navRegister">Регистрация</a>
-            <a href="listing-create.html">Создать объявление</a>
-            <a href="my-listings.html">Мои объявления</a>
-            <a href="my-bookings.html">Мои брони</a>
-            <a href="favorites.html">Избранное</a>
-            <a href="profile.html">Профиль</a>
-            <button id="logoutBtn" style="display: none;">Выйти</button>
+            <a href="login.html" id="navLogin" data-i18n="nav_login">Войти</a>
+            <a href="register.html" id="navRegister" data-i18n="nav_register">Регистрация</a>
+            <a href="listing-create.html" data-i18n="nav_create">Создать объявление</a>
+            <a href="my-listings.html" data-i18n="nav_my_listings">Мои объявления</a>
+            <a href="my-bookings.html" data-i18n="nav_my_bookings">Мои брони</a>
+            <a href="favorites.html" data-i18n="nav_favorites">Избранное</a>
+            <a href="profile.html" data-i18n="nav_profile">Профиль</a>
+            <button id="logoutBtn" style="display: none;" data-i18n="nav_logout">Выйти</button>
+            <select id="languageSelect" onchange="setLanguage(this.value)">
+                <option value="ru">RU</option>
+                <option value="en">EN</option>
+                <option value="de">DE</option>
+                <option value="uk">UA</option>
+            </select>
         </div>
     </nav>
 
     <div class="page">
-        <h1>Все объявления</h1>
+        <h1 data-i18n="catalog_title">Все объявления</h1>
 
         <form id="filterForm" class="form-grid" style="max-width: none; margin-bottom: 1.5rem;">
             <div>
-                <label>Поиск по названию/описанию</label>
+                <label data-i18n="search_label">Поиск по названию/описанию</label>
                 <input type="text" id="searchInput" placeholder="Например: cozy loft">
             </div>
             <div>
-                <label>Сортировка</label>
+                <label data-i18n="sort_label">Сортировка</label>
                 <select id="orderingSelect">
-                    <option value="">По умолчанию</option>
-                    <option value="popular_views">По популярности (просмотры)</option>
-                    <option value="popular_reviews">По популярности (отзывы)</option>
+                    <option value="" data-i18n="sort_default">По умолчанию</option>
+                    <option value="popular_views" data-i18n="sort_views">По популярности (просмотры)</option>
+                    <option value="popular_reviews" data-i18n="sort_reviews">По популярности (отзывы)</option>
                 </select>
             </div>
             <div>
-                <label>Цена от (€)</label>
+                <label data-i18n="price_from">Цена от (€)</label>
                 <input type="number" id="minPriceInput" min="0" step="0.01">
             </div>
             <div>
-                <label>Цена до (€)</label>
+                <label data-i18n="price_to">Цена до (€)</label>
                 <input type="number" id="maxPriceInput" min="0" step="0.01">
             </div>
             <div class="full">
-                <button type="submit">Применить</button>
-                <button type="button" class="secondary" id="resetFiltersBtn">Сбросить</button>
+                <button type="submit" data-i18n="apply_btn">Применить</button>
+                <button type="button" class="secondary" id="resetFiltersBtn" data-i18n="reset_btn">Сбросить</button>
             </div>
         </form>
 
-        <div id="listingsContainer">Загрузка...</div>
+        <div id="listingsContainer" data-i18n="loading">Загрузка...</div>
     </div>
 
     <script src="js/api.js"></script>
+    <script src="js/i18n.js"></script>
     <script>
         const listingsContainer = document.getElementById('listingsContainer');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -104,7 +111,7 @@
         }
 
         async function loadListings() {
-            listingsContainer.textContent = 'Загрузка...';
+            listingsContainer.textContent = t('loading');
             try {
                 const listings = await apiGet(`/listings/${buildQuery()}`);
                 if (isLoggedIn()) {
@@ -120,7 +127,7 @@
 
         function renderListings(listings) {
             if (listings.length === 0) {
-                listingsContainer.innerHTML = '<p class="empty-state">Ничего не найдено.</p>';
+                listingsContainer.innerHTML = `<p class="empty-state">${t('not_found')}</p>`;
                 return;
             }
 
@@ -137,9 +144,9 @@
 
                 let actionHtml;
                 if (isOwnListing) {
-                    actionHtml = '<span class="muted">Ваше объявление</span>';
+                    actionHtml = `<span class="muted">${t('own_listing')}</span>`;
                 } else if (isLoggedIn()) {
-                    actionHtml = `<button type="button" class="secondary" onclick="toggleFavorite('${listing.id}', this)">${isFavorite ? '★ В избранном' : '☆ В избранное'}</button>`;
+                    actionHtml = `<button type="button" class="secondary" onclick="toggleFavorite('${listing.id}', this)">${isFavorite ? t('fav_added') : t('fav_add')}</button>`;
                 } else {
                     actionHtml = '';
                 }
@@ -151,10 +158,10 @@
                     <div class="body">
                         <h3>${listing.apartment_name}</h3>
                         <p class="location">${listing.country}, ${listing.address}</p>
-                        <p class="location">До ${listing.max_guests} гостей</p>
-                        <span class="price-tag">${listing.price_per_night} € / сутки</span>
+                        <p class="location">${t('guests_up_to')} ${listing.max_guests} ${t('guests_word')}</p>
+                        <span class="price-tag">${listing.price_per_night} € ${t('per_night')}</span>
                         <div class="actions">
-                            <a href="listing-detail.html?id=${listing.id}">Подробнее →</a>
+                            <a href="listing-detail.html?id=${listing.id}">${t('more_details')}</a>
                             ${actionHtml}
                         </div>
                     </div>
@@ -172,11 +179,11 @@
                     const favId = favoriteIds.get(listingId);
                     await apiDelete(`/listings/favorites/${favId}/`);
                     favoriteIds.delete(listingId);
-                    button.textContent = '☆ В избранное';
+                    button.textContent = t('fav_add');
                 } else {
                     const favorite = await apiPost('/listings/favorites/', { listing: listingId });
                     favoriteIds.set(listingId, favorite.id);
-                    button.textContent = '★ В избранном';
+                    button.textContent = t('fav_added');
                 }
             } catch (err) {
                 alert('Не удалось изменить избранное: ' + JSON.stringify(err.data));

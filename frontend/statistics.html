@@ -6,12 +6,22 @@
     <title>Статистика объявления</title>
 </head>
 <body>
-    <p><a href="my-listings.html">← Назад к моим объявлениям</a></p>
-    <h1>Статистика</h1>
+    <div style="text-align: right; padding: 0.5rem 1rem;">
+        <select id="languageSelect" onchange="setLanguage(this.value)">
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+            <option value="uk">UA</option>
+        </select>
+    </div>
 
-    <div id="statsContainer">Загрузка...</div>
+    <p><a href="my-listings.html" data-i18n="back_to_my_listings">← Назад к моим объявлениям</a></p>
+    <h1 data-i18n="statistics_title">Статистика</h1>
+
+    <div id="statsContainer" data-i18n="loading">Загрузка...</div>
 
     <script src="js/api.js"></script>
+    <script src="js/i18n.js"></script>
     <script>
         const params = new URLSearchParams(window.location.search);
         const listingId = params.get('listing_id');
@@ -20,21 +30,21 @@
             const container = document.getElementById('statsContainer');
 
             if (!listingId) {
-                container.textContent = 'Объявление не указано.';
+                container.textContent = t('listing_not_specified');
                 return;
             }
 
             try {
                 const stats = await apiGet(`/statistics/listing/${listingId}/`);
                 container.innerHTML = `
-                    <p>Просмотров: ${stats.view_count}</p>
-                    <p>Броней: ${stats.booking_count}</p>
-                    <p>Выручка: ${stats.total_revenue} €</p>
-                    <p>Средний рейтинг: ${stats.average_rating ?? 'нет отзывов'}</p>
-                    <p>Количество отзывов: ${stats.reviews_count}</p>
+                    <p>${t('views_label')}: ${stats.view_count}</p>
+                    <p>${t('booking_count_label')} ${stats.booking_count}</p>
+                    <p>${t('revenue_label')}: ${stats.total_revenue} €</p>
+                    <p>${t('avg_rating_stat_label')}: ${stats.average_rating ?? t('no_reviews')}</p>
+                    <p>${t('reviews_count_label')}: ${stats.reviews_count}</p>
                 `;
             } catch (err) {
-                container.textContent = 'Статистика пока недоступна для этого объявления.';
+                container.textContent = t('statistics_unavailable');
             }
         }
 

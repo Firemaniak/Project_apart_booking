@@ -6,13 +6,23 @@
     <title>Профиль пользователя</title>
 </head>
 <body>
-    <p><a href="index.html">← Назад к каталогу</a></p>
-    <div id="userContainer">Загрузка...</div>
+    <div style="text-align: right; padding: 0.5rem 1rem;">
+        <select id="languageSelect" onchange="setLanguage(this.value)">
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+            <option value="uk">UA</option>
+        </select>
+    </div>
 
-    <h2>Статистика как хозяин</h2>
+    <p><a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a></p>
+    <div id="userContainer" data-i18n="loading">Загрузка...</div>
+
+    <h2 data-i18n="host_stats_title">Статистика как хозяин</h2>
     <div id="statsContainer"></div>
 
     <script src="js/api.js"></script>
+    <script src="js/i18n.js"></script>
     <script>
         const params = new URLSearchParams(window.location.search);
         const userId = params.get('id');
@@ -25,10 +35,10 @@
                     <h1>${user.username}</h1>
                     ${user.first_name || user.last_name ? `<p>${user.first_name} ${user.last_name}</p>` : ''}
                     ${user.avatar ? `<img src="${user.avatar}" width="150">` : ''}
-                    <p>На платформе с ${new Date(user.date_joined).toLocaleDateString()}</p>
+                    <p>${t('member_since')} ${new Date(user.date_joined).toLocaleDateString()}</p>
                 `;
             } catch (err) {
-                container.textContent = 'Пользователь не найден.';
+                container.textContent = t('user_not_found');
             }
         }
 
@@ -37,12 +47,12 @@
             try {
                 const stats = await apiGet(`/statistics/user/${userId}/`);
                 container.innerHTML = `
-                    <p>Объявлений: ${stats.listing_count}</p>
-                    <p>Броней: ${stats.booking_count}</p>
-                    <p>Средний рейтинг: ${stats.stars_count ?? 'нет отзывов'}</p>
+                    <p>${t('listing_count_label')} ${stats.listing_count}</p>
+                    <p>${t('booking_count_label')} ${stats.booking_count}</p>
+                    <p>${t('avg_rating_stat_label')}: ${stats.stars_count ?? t('no_reviews')}</p>
                 `;
             } catch (err) {
-                container.textContent = 'Статистика недоступна.';
+                container.textContent = t('stats_unavailable');
             }
         }
 

@@ -1,4 +1,4 @@
-from .models import Listing, Photo, Favorite
+from .models import Listing, Photo, Favorite, PropertyTypeChoices
 from rest_framework import serializers
 from django.utils import timezone
 
@@ -33,12 +33,22 @@ class ListingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Listing
         fields = [
-            'apartment_name', 'description', 'address', 'floor', 'country',
+            'apartment_name', 'description', 'address', 'floor', 'floors_count', 'country',
             'room_count', 'shower_count', 'toilets_count', 'max_guests', 'input_type',
             'parking', 'can_smoke', 'wifi', 'indoor_fireplace', 'can_pets',
             'facilities_for_guests_with_disabilities', 'air_conditioner', 'elevator',
             'price_per_night', 'property_type', 'is_active', 'latitude', 'longitude'
         ]
+
+    def validate(self, attrs):
+        property_type = attrs.get('property_type', PropertyTypeChoices.apartment)
+        if property_type == 'house':
+            if not attrs.get('floors_count'):
+                raise serializers.ValidationError({'floors_count': 'Required for houses.'})
+        else:
+            if not attrs.get('floor'):
+                raise serializers.ValidationError({'floor': 'Required for apartments and rooms.'})
+        return attrs
 
 
 

@@ -6,16 +6,26 @@
     <title>Мои объявления</title>
 </head>
 <body>
-    <p><a href="index.html">← Назад к каталогу</a></p>
-    <h1>Мои объявления</h1>
+    <div style="text-align: right; padding: 0.5rem 1rem;">
+        <select id="languageSelect" onchange="setLanguage(this.value)">
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+            <option value="uk">UA</option>
+        </select>
+    </div>
+
+    <p><a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a></p>
+    <h1 data-i18n="my_listings_title">Мои объявления</h1>
 
     <p id="authWarning" style="display: none; color: red;">
-        Нужно <a href="login.html">войти</a>, чтобы увидеть свои объявления.
+        <span data-i18n="need_login_prefix">Нужно</span> <a href="login.html" data-i18n="login_link">войти</a>, <span data-i18n="need_login_my_listings_suffix">чтобы увидеть свои объявления.</span>
     </p>
 
     <div id="listingsContainer"></div>
 
     <script src="js/api.js"></script>
+    <script src="js/i18n.js"></script>
     <script>
         if (!isLoggedIn()) {
             document.getElementById('authWarning').style.display = 'block';
@@ -28,7 +38,7 @@
             try {
                 const listings = await apiGet('/listings/my/');
                 if (listings.length === 0) {
-                    container.textContent = 'У вас пока нет объявлений.';
+                    container.textContent = t('my_listings_empty');
                     return;
                 }
                 container.innerHTML = listings.map(function (listing) {
@@ -38,20 +48,20 @@
                     return `
                         <div class="panel">
                             ${photoUrl ? `<img src="${photoUrl}" width="150">` : ''}
-                            <h3>${listing.apartment_name} ${listing.is_active ? '' : '<span class="muted">(скрыто)</span>'}</h3>
+                            <h3>${listing.apartment_name} ${listing.is_active ? '' : `<span class="muted">(${t('hidden_label')})</span>`}</h3>
                             <p>${listing.country}, ${listing.address}</p>
-                            <p><strong>${listing.price_per_night} €</strong> / сутки</p>
-                            <a href="listing-detail.html?id=${listing.id}">Посмотреть</a> |
-                            <a href="listing-edit.html?id=${listing.id}">Редактировать</a> |
-                            <a href="statistics.html?listing_id=${listing.id}">Статистика</a>
+                            <p><strong>${listing.price_per_night} €</strong> ${t('per_night')}</p>
+                            <a href="listing-detail.html?id=${listing.id}">${t('view_btn')}</a> |
+                            <a href="listing-edit.html?id=${listing.id}">${t('edit_btn')}</a> |
+                            <a href="statistics.html?listing_id=${listing.id}">${t('statistics_btn')}</a>
                             <button type="button" class="secondary" onclick="toggleActive('${listing.id}')">
-                                ${listing.is_active ? 'Скрыть' : 'Показать'}
+                                ${listing.is_active ? t('hide_btn') : t('show_btn')}
                             </button>
                         </div>
                     `;
                 }).join('');
             } catch (err) {
-                container.textContent = 'Не удалось загрузить объявления.';
+                container.textContent = t('my_listings_load_error');
             }
         }
 
@@ -60,7 +70,7 @@
                 await apiPatch(`/listings/${listingId}/toggle-active/`, {});
                 await loadMyListings();
             } catch (err) {
-                alert('Не удалось изменить статус: ' + JSON.stringify(err.data));
+                alert(t('toggle_active_error') + ': ' + JSON.stringify(err.data));
             }
         }
     </script>
