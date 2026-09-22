@@ -188,6 +188,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_FROM_EMAIL = 'firemaniak@gmail.com'
 
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 #-----------------------------------------------------------------------------------------------------------------------
 
