@@ -7,81 +7,91 @@
     <title>Редактировать объявление</title>
 </head>
 <body>
-    <p><a href="my-listings.html">← Назад к моим объявлениям</a></p>
-    <h1>Редактировать объявление</h1>
+    <div style="text-align: right; padding: 0.5rem 1rem;">
+        <select id="languageSelect" onchange="setLanguage(this.value)">
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+            <option value="uk">UA</option>
+        </select>
+    </div>
+
+    <p><a href="my-listings.html" data-i18n="back_to_my_listings">← Назад к моим объявлениям</a></p>
+    <h1 data-i18n="edit_listing_title">Редактировать объявление</h1>
 
     <form id="listingForm">
-        <div><label>Название:</label><input type="text" id="apartmentName" required></div>
-        <div><label>Описание:</label><textarea id="description"></textarea></div>
-        <div><label>Страна:</label>
+        <div><label data-i18n="name_label">Название:</label><input type="text" id="apartmentName" required></div>
+        <div><label data-i18n="description_label">Описание:</label><textarea id="description"></textarea></div>
+        <div><label data-i18n="country_label">Страна:</label>
             <select id="country" required>
-                <option value="DE">Германия</option>
+                <option value="DE" data-i18n="germany_option">Германия</option>
             </select>
         </div>
 
         <div>
-            <label>Адрес:</label>
+            <label data-i18n="address_label">Адрес:</label>
             <input type="text" id="address" required>
-            <button type="button" class="secondary" id="findOnMapBtn">Найти на карте</button>
+            <button type="button" class="secondary" id="findOnMapBtn" data-i18n="find_on_map_btn">Найти на карте</button>
         </div>
 
         <div>
-            <label>Местоположение на карте (кликните, чтобы изменить точку)</label>
+            <label data-i18n="map_location_edit_label">Местоположение на карте (кликните, чтобы изменить точку)</label>
             <div id="mapPicker" style="height: 300px; border: 1px solid var(--line); border-radius: var(--radius);"></div>
             <input type="hidden" id="latitude">
             <input type="hidden" id="longitude">
         </div>
 
-        <div><label>Тип жилья:</label>
+        <div><label data-i18n="property_type_label">Тип жилья:</label>
             <select id="propertyType">
-                <option value="apartment">Квартира</option>
-                <option value="house">Дом</option>
-                <option value="studio">Студия</option>
+                <option value="apartment" data-i18n="type_apartment">Квартира</option>
+                <option value="house" data-i18n="type_house">Дом</option>
+                <option value="studio" data-i18n="type_studio">Студия</option>
             </select>
         </div>
 
-        <div id="floorField"><label>Этаж:</label><input type="number" id="floor" min="1"></div>
-        <div id="floorsCountField" style="display: none;"><label>Количество этажей:</label><input type="number" id="floorsCount" min="1"></div>
+        <div id="floorField"><label data-i18n="floor_label">Этаж:</label><input type="number" id="floor" min="1"></div>
+        <div id="floorsCountField" style="display: none;"><label data-i18n="floors_count_label">Количество этажей:</label><input type="number" id="floorsCount" min="1"></div>
 
         <div id="roomsSection">
-            <div><label>Количество комнат:</label><input type="number" id="roomCount" min="1" required></div>
-            <div><label>Количество ванных:</label><input type="number" id="showerCount" min="1" required></div>
-            <div><label>Количество туалетов:</label><input type="number" id="toiletsCount" min="1" required></div>
+            <div><label data-i18n="room_count_label">Количество комнат:</label><input type="number" id="roomCount" min="1" required></div>
+            <div><label data-i18n="shower_count_label">Количество ванных:</label><input type="number" id="showerCount" min="1" required></div>
+            <div><label data-i18n="toilets_count_label">Количество туалетов:</label><input type="number" id="toiletsCount" min="1" required></div>
         </div>
 
-        <div><label>Макс. гостей:</label><input type="number" id="maxGuests" min="1" required></div>
-        <div><label>Как попасть внутрь:</label>
+        <div><label data-i18n="max_guests_label">Макс. гостей:</label><input type="number" id="maxGuests" min="1" required></div>
+        <div><label data-i18n="input_type_label">Как попасть внутрь:</label>
             <select id="inputType">
-                <option value="key">Ключ</option>
-                <option value="pin_kode">Пин-код</option>
-                <option value="card">Карта</option>
+                <option value="key" data-i18n="input_key">Ключ</option>
+                <option value="pin_kode" data-i18n="input_pin">Пин-код</option>
+                <option value="card" data-i18n="input_card">Карта</option>
             </select>
         </div>
-        <div><label>Цена за сутки (€):</label><input type="number" id="pricePerNight" step="0.01" min="0.01" required></div>
+        <div><label data-i18n="price_per_night_label">Цена за сутки (€):</label><input type="number" id="pricePerNight" step="0.01" min="0.01" required></div>
 
-        <div><label><input type="checkbox" id="parking"> Парковка</label></div>
+        <div><label><input type="checkbox" id="parking"> <span data-i18n="parking_label">Парковка</span></label></div>
         <div><label><input type="checkbox" id="wifi"> Wi-Fi</label></div>
-        <div><label><input type="checkbox" id="canSmoke"> Можно курить</label></div>
-        <div><label><input type="checkbox" id="canPets"> Можно с питомцами</label></div>
-        <div><label><input type="checkbox" id="indoorFireplace"> Камин</label></div>
-        <div><label><input type="checkbox" id="airConditioner"> Кондиционер</label></div>
-        <div><label><input type="checkbox" id="elevator"> Лифт</label></div>
-        <div><label><input type="checkbox" id="facilities"> Доступно для людей с инвалидностью</label></div>
+        <div><label><input type="checkbox" id="canSmoke"> <span data-i18n="smoke_label">Можно курить</span></label></div>
+        <div><label><input type="checkbox" id="canPets"> <span data-i18n="pets_label">Можно с питомцами</span></label></div>
+        <div><label><input type="checkbox" id="indoorFireplace"> <span data-i18n="fireplace_label">Камин</span></label></div>
+        <div><label><input type="checkbox" id="airConditioner"> <span data-i18n="ac_label">Кондиционер</span></label></div>
+        <div><label><input type="checkbox" id="elevator"> <span data-i18n="elevator_label">Лифт</span></label></div>
+        <div><label><input type="checkbox" id="facilities"> <span data-i18n="disability_label">Доступно для людей с инвалидностью</span></label></div>
 
-        <button type="submit">Сохранить изменения</button>
+        <button type="submit" data-i18n="save_changes_btn">Сохранить изменения</button>
     </form>
 
-    <h2>Фото</h2>
+    <h2 data-i18n="photos_title">Фото</h2>
     <div id="photosContainer"></div>
 
-    <h3>Добавить новое фото</h3>
+    <h3 data-i18n="add_new_photo_title">Добавить новое фото</h3>
     <input type="file" id="photoInput" accept="image/*" multiple>
-    <button id="uploadPhotosBtn" type="button">Загрузить</button>
+    <button id="uploadPhotosBtn" type="button" data-i18n="upload_btn">Загрузить</button>
     <p id="photoMessage"></p>
 
     <p id="message"></p>
 
     <script src="js/api.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const params = new URLSearchParams(window.location.search);
@@ -131,7 +141,7 @@
         document.getElementById('findOnMapBtn').addEventListener('click', async function () {
             const address = document.getElementById('address').value.trim();
             if (!address) {
-                alert('Сначала введите адрес.');
+                alert(t('enter_address_first'));
                 return;
             }
 
@@ -142,7 +152,7 @@
                 const results = await response.json();
 
                 if (results.length === 0) {
-                    alert('Адрес не найден.');
+                    alert(t('address_not_found'));
                     return;
                 }
 
@@ -151,7 +161,7 @@
                 pickerMap.setView([lat, lng], 16);
                 placeMarker(lat, lng);
             } catch (err) {
-                alert('Не удалось найти адрес на карте.');
+                alert(t('address_search_error'));
             }
         });
 
@@ -194,7 +204,7 @@
                 fillForm(listing);
                 renderPhotos(listing);
             } catch (err) {
-                document.getElementById('message').textContent = 'Не удалось загрузить объявление.';
+                document.getElementById('message').textContent = t('listing_load_error');
             }
         }
 
@@ -236,7 +246,7 @@
             const photos = listing.photos || [];
 
             if (photos.length === 0) {
-                container.textContent = 'Фото пока нет.';
+                container.textContent = t('no_photos_yet');
                 return;
             }
 
@@ -244,19 +254,19 @@
                 return `
                     <div style="display: inline-block; margin-right: 10px; text-align: center;">
                         <img src="${photo.image}" width="150"><br>
-                        <button type="button" onclick="deletePhoto('${photo.id}')">Удалить</button>
+                        <button type="button" onclick="deletePhoto('${photo.id}')">${t('delete_photo_btn')}</button>
                     </div>
                 `;
             }).join('');
         }
 
         async function deletePhoto(photoId) {
-            if (!confirm('Удалить это фото?')) return;
+            if (!confirm(t('delete_photo_confirm'))) return;
             try {
                 await apiDelete(`/listings/photos/${photoId}/delete/`);
                 await loadListing();
             } catch (err) {
-                alert('Не удалось удалить фото: ' + JSON.stringify(err.data));
+                alert(t('delete_photo_error') + ': ' + JSON.stringify(err.data));
             }
         }
 
@@ -265,7 +275,7 @@
             const photoMessage = document.getElementById('photoMessage');
 
             if (files.length === 0) {
-                photoMessage.textContent = 'Выберите хотя бы один файл.';
+                photoMessage.textContent = t('select_file_prompt');
                 return;
             }
 
@@ -284,7 +294,7 @@
             }
 
             photoMessage.style.color = 'green';
-            photoMessage.textContent = `Загружено: ${uploaded} из ${files.length}`;
+            photoMessage.textContent = `${t('photos_uploaded')}: ${uploaded} / ${files.length}`;
             document.getElementById('photoInput').value = '';
             await loadListing();
         });
@@ -322,7 +332,7 @@
             try {
                 await apiPatch(`/listings/${listingId}/`, payload);
                 message.style.color = 'green';
-                message.textContent = 'Изменения сохранены!';
+                message.textContent = t('changes_saved');
             } catch (err) {
                 message.style.color = 'red';
                 message.textContent = JSON.stringify(err.data);

@@ -21,6 +21,10 @@ from django.conf.urls.static import static
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
+from django.views.static import serve
+from django.conf import settings
+
+BASE_DIR = settings.BASE_DIR
 
 schema_view = get_schema_view(
     openapi.Info(title="Apartment Booking API", default_version='v1'),
@@ -42,3 +46,11 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+FRONTEND_DIR = BASE_DIR / 'frontend'
+
+urlpatterns += [
+    path('', serve, {'document_root': FRONTEND_DIR, 'path': 'index.html'}),
+    path('<path:path>', serve, {'document_root': FRONTEND_DIR}),
+]

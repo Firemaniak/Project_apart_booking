@@ -75,6 +75,10 @@ const translations = {
         address_not_found: 'Адрес не найден. Попробуйте уточнить его или выберите точку на карте вручную.',
         address_search_error: 'Не удалось найти адрес на карте.', select_file_prompt: 'Выберите хотя бы один файл.',
         photos_uploaded: 'Загружено фото',
+        edit_listing_title: 'Редактировать объявление', map_location_edit_label: 'Местоположение на карте (кликните, чтобы изменить точку)',
+        save_changes_btn: 'Сохранить изменения', photos_title: 'Фото', add_new_photo_title: 'Добавить новое фото',
+        upload_btn: 'Загрузить', delete_photo_btn: 'Удалить', no_photos_yet: 'Фото пока нет.',
+        delete_photo_confirm: 'Удалить это фото?', delete_photo_error: 'Не удалось удалить фото', changes_saved: 'Изменения сохранены!',
     },
     en: {
         nav_login: 'Login', nav_register: 'Register', nav_create: 'Create listing',
@@ -152,6 +156,10 @@ const translations = {
         address_not_found: 'Address not found. Try to refine it or pick a point on the map manually.',
         address_search_error: 'Failed to find address on the map.', select_file_prompt: 'Please select at least one file.',
         photos_uploaded: 'Photos uploaded',
+        edit_listing_title: 'Edit listing', map_location_edit_label: 'Location on map (click to change the point)',
+        save_changes_btn: 'Save changes', photos_title: 'Photos', add_new_photo_title: 'Add new photo',
+        upload_btn: 'Upload', delete_photo_btn: 'Delete', no_photos_yet: 'No photos yet.',
+        delete_photo_confirm: 'Delete this photo?', delete_photo_error: 'Failed to delete photo', changes_saved: 'Changes saved!',
     },
     de: {
         nav_login: 'Anmelden', nav_register: 'Registrieren', nav_create: 'Inserat erstellen',
@@ -229,6 +237,10 @@ const translations = {
         address_not_found: 'Adresse nicht gefunden. Präzisieren Sie sie oder wählen Sie einen Punkt manuell auf der Karte.',
         address_search_error: 'Adresse konnte nicht auf der Karte gefunden werden.', select_file_prompt: 'Bitte wählen Sie mindestens eine Datei.',
         photos_uploaded: 'Fotos hochgeladen',
+        edit_listing_title: 'Inserat bearbeiten', map_location_edit_label: 'Standort auf der Karte (klicken Sie, um den Punkt zu ändern)',
+        save_changes_btn: 'Änderungen speichern', photos_title: 'Fotos', add_new_photo_title: 'Neues Foto hinzufügen',
+        upload_btn: 'Hochladen', delete_photo_btn: 'Löschen', no_photos_yet: 'Noch keine Fotos.',
+        delete_photo_confirm: 'Dieses Foto löschen?', delete_photo_error: 'Foto konnte nicht gelöscht werden', changes_saved: 'Änderungen gespeichert!',
     },
     uk: {
         nav_login: 'Увійти', nav_register: 'Реєстрація', nav_create: 'Створити оголошення',
@@ -306,6 +318,10 @@ const translations = {
         address_not_found: 'Адресу не знайдено. Спробуйте уточнити її або виберіть точку на карті вручну.',
         address_search_error: 'Не вдалося знайти адресу на карті.', select_file_prompt: 'Виберіть хоча б один файл.',
         photos_uploaded: 'Завантажено фото',
+        edit_listing_title: 'Редагувати оголошення', map_location_edit_label: 'Розташування на карті (клацніть, щоб змінити точку)',
+        save_changes_btn: 'Зберегти зміни', photos_title: 'Фото', add_new_photo_title: 'Додати нове фото',
+        upload_btn: 'Завантажити', delete_photo_btn: 'Видалити', no_photos_yet: 'Фото поки немає.',
+        delete_photo_confirm: 'Видалити це фото?', delete_photo_error: 'Не вдалося видалити фото', changes_saved: 'Зміни збережено!',
     },
 };
 
