@@ -38,7 +38,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 
-# apps/users/serializers.py
 class UserProfileSerializer(serializers.ModelSerializer):
     total_earned = serializers.DecimalField(source='statistic.total_earned', max_digits=12, decimal_places=2,
                                             read_only=True)
