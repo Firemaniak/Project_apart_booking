@@ -18,7 +18,6 @@ logger = logging.getLogger('apps.statist')
 
 
 # Создание UserStatistic при регистрации
-
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_user_statistic(sender, instance, created, **kwargs):
     if created:
@@ -27,7 +26,6 @@ def create_user_statistic(sender, instance, created, **kwargs):
 
 
 # Booking → обновление статистики листинга и юзеров
-
 @receiver(post_save, sender=Booking)
 def on_booking_created(sender, instance, created, **kwargs):
     if not created:
@@ -53,7 +51,6 @@ def on_booking_created(sender, instance, created, **kwargs):
 
 
 # Review → обновление рейтинга листинга и хозяина
-
 @receiver(post_save, sender=Review)
 def on_review_saved(sender, instance, **kwargs):
     listing = instance.booking.listing
@@ -80,7 +77,6 @@ def on_review_deleted(sender, instance, **kwargs):
 
 
 # Listing → обновление listing_count у владельца
-
 @receiver(post_save, sender=Listing)
 def on_listing_created(sender, instance, created, **kwargs):
     if not created:

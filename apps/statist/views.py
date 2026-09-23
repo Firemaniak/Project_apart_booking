@@ -5,7 +5,16 @@ from .serializers import ListingStatisticSerializer, UserStatisticSerializer
 from django.db.models import Count
 from .models import SearchHistory
 
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+
 class PopularSearchesView(generics.ListAPIView):
+    """
+    Popular searches
+
+    Популярные запросы
+    """
     permission_classes = [permissions.AllowAny]
 
     def list(self, request, *args, **kwargs):
@@ -21,7 +30,11 @@ class PopularSearchesView(generics.ListAPIView):
 
 
 class ListingStatisticDetailView(generics.RetrieveAPIView):
-    """Публичная статистика листингов"""
+    """
+    Public listing statistics
+
+    Публичная статистика листингов
+    """
     queryset = ListingStatistic.objects.all()
     serializer_class = ListingStatisticSerializer
     permission_classes = [permissions.AllowAny]
@@ -29,7 +42,11 @@ class ListingStatisticDetailView(generics.RetrieveAPIView):
 
 
 class UserStatisticDetailView(generics.RetrieveAPIView):
-    """Публичная статистика юзера — рейтинг и активность, без денег"""
+    """
+    Public user statistics — rating and activity, no money involved.
+
+    Публичная статистика юзера — рейтинг и активность, без денег
+    """
     queryset = UserStatistic.objects.all()
     serializer_class = UserStatisticSerializer
     permission_classes = [permissions.AllowAny]

@@ -19,20 +19,8 @@ class Review(UniqueID, TimeStampedModel):
     A guest's review of a completed booking, with an optional public
     response from the host.
 
-    ``booking`` is a OneToOneField — a booking can have at most one
-    review, and ``on_delete=PROTECT`` prevents deleting a booking that
-    already has a review attached. ``owner_response_at`` is set
-    automatically when the host adds a response (see the review
-    signal/save logic).
-
     Отзыв гостя на завершённую бронь, с опциональным публичным ответом
     хозяина.
-
-    ``booking`` — это OneToOneField: у одной брони может быть не более
-    одного отзыва, а ``on_delete=PROTECT`` не даёт удалить бронь,
-    у которой уже есть привязанный отзыв. ``owner_response_at``
-    проставляется автоматически, когда хозяин добавляет ответ (см.
-    логику сигнала/save для отзыва).
     """
     comment = models.TextField(validators=[MinLengthValidator(10)])
     booking = models.OneToOneField(Booking, on_delete=models.PROTECT,

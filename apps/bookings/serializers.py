@@ -7,6 +7,7 @@ from django.utils import timezone
 
 
 class BookingListSerializer(serializers.ModelSerializer):
+
     """
     Read-only representation of a booking, used for list and detail views.
 
@@ -20,6 +21,7 @@ class BookingListSerializer(serializers.ModelSerializer):
     моделью, а статус меняется только через оплату/отмену, но не через
     прямое редактирование.
     """
+
     class Meta:
         model = Booking
         fields = ['id', 'start_date', 'end_date', 'price', 'payment_type',
@@ -32,18 +34,10 @@ class BookingListSerializer(serializers.ModelSerializer):
 
 class BookingCreateSerializer(serializers.ModelSerializer):
     """
+
     Validates and creates a new booking.
-
-    ``guest`` is intentionally excluded from the fields — it is set from
-    the authenticated request user in the view, never accepted from the
-    client, so a guest cannot create a booking on someone else's behalf.
-
     Валидирует и создаёт новую бронь.
 
-    Поле ``guest`` намеренно отсутствует в списке полей — оно
-    проставляется из авторизованного пользователя во вьюхе, а не
-    принимается от клиента, чтобы гость не мог создать бронь от чужого
-    имени.
     """
     class Meta:
         model = Booking
@@ -104,17 +98,13 @@ class PaymentSerializer(serializers.Serializer):
 
     This is not a real payment gateway integration — it only checks
     that the submitted data has a valid format (card number length,
-    expiry date, CVV). Card number and CVV are ``write_only`` and are
-    never stored in full; only the last 4 digits of the card are kept
-    on the booking, in ``Booking.card_last4``.
+    expiry date, CVV). Card number and CVV are ``write_only``.
 
     Валидирует данные симулированной оплаты картой для брони.
 
     Это не интеграция с реальным платёжным шлюзом — проверяется только
     формат введённых данных (длина номера карты, срок действия, CVV).
-    Номер карты и CVV помечены ``write_only`` и никогда не сохраняются
-    целиком; на брони хранятся только последние 4 цифры карты,
-    в поле ``Booking.card_last4``.
+    Номер карты и CVV помечены ``write_only``.
     """
     cardholder_name = serializers.CharField(max_length=100)
     card_number = serializers.CharField(max_length=19, write_only=True)

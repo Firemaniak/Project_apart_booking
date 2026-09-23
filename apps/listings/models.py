@@ -58,20 +58,7 @@ class Listing(UniqueID, TimeStampedModel):
     """
     A property available for short-term rental, owned by a host.
 
-    ``owner`` uses ``on_delete=PROTECT`` — a user cannot be deleted
-    while they still own listings, preserving booking/review history.
-    ``is_active`` lets a host hide a listing from the public catalog
-    without deleting it. Full change history is tracked via
-    ``simple_history`` (``HistoricalRecords``).
-
-    Объект недвижимости, доступный для краткосрочной аренды,
-    принадлежащий хозяину.
-
-    ``owner`` использует ``on_delete=PROTECT`` — пользователя нельзя
-    удалить, пока у него есть листинги, это сохраняет историю
-    броней/отзывов. ``is_active`` позволяет хозяину скрыть листинг
-    из публичного каталога, не удаляя его. Полная история изменений
-    отслеживается через ``simple_history`` (``HistoricalRecords``).
+    Объект недвижимости, доступный для краткосрочной аренды, принадлежащий хозяину.
     """
     apartment_name = models.CharField(max_length=30, validators=[MinLengthValidator(3)],
                                   verbose_name='apartment name')
@@ -175,14 +162,7 @@ class Photo(UniqueID, TimeStampedModel):
     """
     A single photo belonging to a listing's gallery.
 
-    Deleted automatically (``on_delete=CASCADE``) when its listing is
-    deleted, since a photo has no meaning without the listing it
-    illustrates.
-
     Одна фотография из галереи листинга.
-
-    Удаляется автоматически (``on_delete=CASCADE``) вместе с листингом,
-    так как фото не имеет смысла без листинга, который оно иллюстрирует.
     """
     image = models.ImageField(upload_to='listing_photos/')
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='photos')
@@ -204,18 +184,10 @@ class Photo(UniqueID, TimeStampedModel):
 class Favorite(UniqueID, TimeStampedModel):
     """
     A user's bookmark of a listing they're interested in.
-
-    ``unique_together`` prevents a user from favoriting the same
-    listing twice. Uses ``CASCADE`` on both sides, since a favorite
-    is derived data with no meaning once either the user or the
-    listing is gone.
+    ``unique_together`` prevents a user from favoriting the same listing twice.
 
     Закладка пользователя на понравившийся ему листинг.
-
-    ``unique_together`` не даёт пользователю добавить один и тот же
-    листинг в избранное дважды. Использует ``CASCADE`` с обеих сторон,
-    так как избранное — производные данные, не имеющие смысла после
-    удаления пользователя или листинга.
+    ``unique_together`` не даёт пользователю добавить один и тот же листинг в избранное дважды.
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorites')
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='favorited_by')

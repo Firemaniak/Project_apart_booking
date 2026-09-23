@@ -29,16 +29,8 @@ class BookingListCreateView(generics.ListCreateAPIView):
     List the current user's bookings (as guest or as listing owner)
     and create new bookings.
 
-    A user sees a booking if they are either the guest who made it or
-    the owner of the listing it was made on — so hosts can see incoming
-    reservations without a separate endpoint.
-
     Список броней текущего пользователя (как гостя или как владельца
     листинга) и создание новых броней.
-
-    Пользователь видит бронь, если он либо гость, создавший её, либо
-    владелец листинга, на который она сделана — так хозяева видят
-    входящие брони без отдельного эндпоинта.
     """
     permission_classes = [permissions.IsAuthenticated]
 
@@ -88,9 +80,7 @@ class BookingDetailView(generics.RetrieveDestroyAPIView):
     Просмотр или отмена одной брони.
 
     Редактирование сознательно не поддерживается — бронь либо
-    отменяется и создаётся заново, либо остаётся как есть; см. решение
-    в переписке о том, почему частичное изменение дат/цены не
-    реализовано намеренно.
+    отменяется и создаётся заново, либо остаётся как есть
     """
     serializer_class = BookingListSerializer
     permission_classes = [IsBookingParticipant]
@@ -107,12 +97,9 @@ class BookingDetailView(generics.RetrieveDestroyAPIView):
     def perform_destroy(self, instance):
         """
         Prevent cancelling bookings that have already ended, and
-        surface a clean error instead of a raw ProtectedError when
-        the booking already has a review attached.
+        surface a clean error.
 
-        Запрещает отмену уже завершённых броней и возвращает понятную
-        ошибку вместо голого ProtectedError, если у брони уже есть
-        привязанный отзыв.
+        Запрещает отмену уже завершённых броней и возвращает ошибку .
         """
         if instance.end_date < timezone.now():
             raise DRFValidationError("Can't cancel a booking that has already ended.")
@@ -158,14 +145,12 @@ class BookingPaymentView(generics.GenericAPIView):
     """
     Simulates paying for a pending booking with a card.
 
-    Validates the submitted card details (format only — this is not
-    a real payment gateway), stores only the last 4 digits of the
+    Validates the submitted card details (format only), stores only the last 4 digits of the
     card, marks the booking as paid, and sends a confirmation email.
 
     Симулирует оплату ожидающей брони картой.
 
-    Проверяет введённые данные карты (только формат — это не
-    интеграция с реальным платёжным шлюзом), сохраняет только
+    Проверяет введённые данные карты (только формат, сохраняет только
     последние 4 цифры карты, помечает бронь оплаченной и отправляет
     письмо-подтверждение.
     """

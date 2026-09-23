@@ -37,16 +37,8 @@ class ListingListSerializer(serializers.ModelSerializer):
     Full read representation of a listing, used for both the catalog
     and the detail page.
 
-    Includes the nested photo gallery and the owner's username
-    (resolved via ``source``) so the frontend does not need a separate
-    request just to display who owns the listing.
-
     Полное представление листинга для чтения — используется и для
     каталога, и для страницы деталей.
-
-    Включает вложенную галерею фото и username владельца
-    (через ``source``), чтобы фронтенду не требовался отдельный
-    запрос только для отображения владельца.
     """
     photos = PhotoSerializer(many=True, read_only=True)
     owner_username = serializers.CharField(source='owner.username', read_only=True)

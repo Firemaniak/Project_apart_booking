@@ -10,22 +10,16 @@ from rest_framework.response import Response
 from django.db.models import Q
 
 
+#-----------------------------------------------------------------------------------------------------------------------
+
+
 class ListingListCreateView(generics.ListCreateAPIView):
     """
     Public listing catalog with search, price filtering, and popularity
     sorting; also handles listing creation.
 
-    Anyone can browse the catalog (``IsAuthenticatedOrReadOnly``);
-    only authenticated users can create listings. Each search query
-    is logged to ``SearchHistory`` for the "popular searches" feature.
-
     Публичный каталог объявлений с поиском, фильтром по цене и
     сортировкой по популярности; также обрабатывает создание листинга.
-
-    Просматривать каталог может кто угодно
-    (``IsAuthenticatedOrReadOnly``); создавать листинги — только
-    авторизованные пользователи. Каждый поисковый запрос логируется
-    в ``SearchHistory`` для функции "популярные запросы".
     """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 

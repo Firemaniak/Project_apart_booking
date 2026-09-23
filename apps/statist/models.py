@@ -17,6 +17,13 @@ from django.utils import timezone
 # -----------------------------------------------------------------------------------------------------------------------
 
 class ListingStatistic(UniqueID, TimeStampedModel):
+    """
+    Stores aggregated statistics for a listing.
+    Includes views, bookings, revenue, rating, and review count.
+
+    Хранит агрегированную статистику по объявлению.
+    Включает данные о просмотрах, бронированиях, выручке, рейтинге и количестве отзывов.
+    """
     view_count = models.PositiveIntegerField(default=0)
     booking_count = models.PositiveIntegerField(default=0)
     total_revenue = models.DecimalField(max_digits=12, decimal_places=2, default=0)
@@ -39,6 +46,13 @@ class ListingStatistic(UniqueID, TimeStampedModel):
 
 
 class UserStatistic(UniqueID, TimeStampedModel):
+    """
+    Stores aggregated statistics for a user.
+    Includes bookings, listings, ratings, earnings, and spending.
+
+    Хранит сводную статистику по пользователю.
+    Включает данные о бронированиях, объявлениях, рейтингах, доходах и расходах.
+    """
     booking_count = models.PositiveIntegerField(default=0)
     listing_count = models.PositiveIntegerField(default=0)
     stars_count = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
@@ -59,6 +73,12 @@ class UserStatistic(UniqueID, TimeStampedModel):
 
 
 class SearchHistory(UniqueID, TimeStampedModel):
+    """
+    Stores a user's search queries.
+
+    Сохраняет поисковые запросы пользователя.
+    """
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                              related_name='search_history', null=True, blank=True)
     keyword = models.CharField(max_length=100)
@@ -74,6 +94,14 @@ class SearchHistory(UniqueID, TimeStampedModel):
 
 
 class ListingView(UniqueID, TimeStampedModel):
+
+    """
+    Records a view of a listing.
+    The viewer may be either an authenticated user or an anonymous visitor.
+
+    Фиксирует просмотр объявления.
+    Просматривающим может быть как авторизованный пользователь, так и анонимный посетитель.
+    """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                              related_name='listing_views', null=True, blank=True)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='view_history')
