@@ -3,7 +3,8 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 class IsOwnerOrReadOnly(BasePermission):
 
-    """Редактировать/удалять может только владелец объекта; читать — все."""
+    """Only the object's owner can edit or delete it; everyone can read it.
+    Редактировать/удалять может только владелец объекта; читать — все."""
 
     owner_field = 'owner'
 
@@ -16,6 +17,8 @@ class IsOwnerOrReadOnly(BasePermission):
 class IsBookingParticipant(BasePermission):
 
     """
+    The booking can be viewed by the guest and the listing owner (listing.owner).
+    Only the guest can delete (cancel) the booking.
     Видеть бронь могут: сам гость (guest) и хозяин листинга (listing.owner).
     Удалять (отменять) бронь может только гость.
     """

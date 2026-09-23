@@ -21,6 +21,7 @@ class PopularSearchesView(generics.ListAPIView):
 
 
 class ListingStatisticDetailView(generics.RetrieveAPIView):
+    """Публичная статистика листингов"""
     queryset = ListingStatistic.objects.all()
     serializer_class = ListingStatisticSerializer
     permission_classes = [permissions.AllowAny]
