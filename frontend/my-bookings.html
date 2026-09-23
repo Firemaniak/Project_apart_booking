@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/style.css">
-    <title>Мои брони</title>
+    <title>StayHome — Мои брони</title>
 </head>
 <body>
-    <div style="text-align: right; padding: 0.5rem 1rem;">
-        <select id="languageSelect" onchange="setLanguage(this.value)">
+    <div class="utility-bar">
+        <select id="languageSelect" class="lang-select" onchange="setLanguage(this.value)">
             <option value="ru">RU</option>
             <option value="en">EN</option>
             <option value="de">DE</option>
@@ -15,18 +15,37 @@
         </select>
     </div>
 
-    <p><a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a></p>
-    <h1 data-i18n="my_bookings_title">Мои брони</h1>
+    <nav class="site-nav">
+        <a href="index.html" class="brand">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 11L12 4L21 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 10V19C5 19.5523 5.44772 20 6 20H9V15C9 14.4477 9.44772 14 10 14H14C14.5523 14 15 14.4477 15 15V20H18C18.5523 20 19 19.5523 19 19V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            StayHome
+        </a>
+        <div class="links">
+            <a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a>
+            <a href="listing-create.html" data-i18n="nav_create">Создать объявление</a>
+            <a href="my-listings.html" data-i18n="nav_my_listings">Мои объявления</a>
+            <a href="my-bookings.html" data-i18n="nav_my_bookings">Мои брони</a>
+            <a href="favorites.html" data-i18n="nav_favorites">Избранное</a>
+            <a href="profile.html" data-i18n="nav_profile">Профиль</a>
+        </div>
+    </nav>
 
-    <p id="authWarning" style="display: none; color: red;">
-        <span data-i18n="need_login_prefix">Нужно</span> <a href="login.html" data-i18n="login_link">войти</a>, <span data-i18n="need_login_my_bookings_suffix">чтобы увидеть свои брони.</span>
-    </p>
+    <div class="page">
+        <h1 data-i18n="my_bookings_title">Мои брони</h1>
 
-    <h2 data-i18n="as_guest_title">Я бронировал(а)</h2>
-    <div id="asGuestContainer"></div>
+        <p id="authWarning" style="display: none; color: red;">
+            <span data-i18n="need_login_prefix">Нужно</span> <a href="login.html" data-i18n="login_link">войти</a>, <span data-i18n="need_login_my_bookings_suffix">чтобы увидеть свои брони.</span>
+        </p>
 
-    <h2 data-i18n="as_owner_title">Брони на мои объявления</h2>
-    <div id="asOwnerContainer"></div>
+        <h2 data-i18n="as_guest_title">Я бронировал(а)</h2>
+        <div id="asGuestContainer"></div>
+
+        <h2 data-i18n="as_owner_title">Брони на мои объявления</h2>
+        <div id="asOwnerContainer"></div>
+    </div>
 
     <script src="js/api.js"></script>
     <script src="js/i18n.js"></script>

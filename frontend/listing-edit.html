@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <title>Редактировать объявление</title>
+    <title>StayHome — Редактировать объявление</title>
 </head>
 <body>
-    <div style="text-align: right; padding: 0.5rem 1rem;">
-        <select id="languageSelect" onchange="setLanguage(this.value)">
+    <div class="utility-bar">
+        <select id="languageSelect" class="lang-select" onchange="setLanguage(this.value)">
             <option value="ru">RU</option>
             <option value="en">EN</option>
             <option value="de">DE</option>
@@ -16,79 +16,98 @@
         </select>
     </div>
 
-    <p><a href="my-listings.html" data-i18n="back_to_my_listings">← Назад к моим объявлениям</a></p>
-    <h1 data-i18n="edit_listing_title">Редактировать объявление</h1>
-
-    <form id="listingForm">
-        <div><label data-i18n="name_label">Название:</label><input type="text" id="apartmentName" required></div>
-        <div><label data-i18n="description_label">Описание:</label><textarea id="description"></textarea></div>
-        <div><label data-i18n="country_label">Страна:</label>
-            <select id="country" required>
-                <option value="DE" data-i18n="germany_option">Германия</option>
-            </select>
+    <nav class="site-nav">
+        <a href="index.html" class="brand">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 11L12 4L21 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 10V19C5 19.5523 5.44772 20 6 20H9V15C9 14.4477 9.44772 14 10 14H14C14.5523 14 15 14.4477 15 15V20H18C18.5523 20 19 19.5523 19 19V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            StayHome
+        </a>
+        <div class="links">
+            <a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a>
+            <a href="listing-create.html" data-i18n="nav_create">Создать объявление</a>
+            <a href="my-listings.html" data-i18n="nav_my_listings">Мои объявления</a>
+            <a href="my-bookings.html" data-i18n="nav_my_bookings">Мои брони</a>
+            <a href="favorites.html" data-i18n="nav_favorites">Избранное</a>
+            <a href="profile.html" data-i18n="nav_profile">Профиль</a>
         </div>
+    </nav>
 
-        <div>
-            <label data-i18n="address_label">Адрес:</label>
-            <input type="text" id="address" required>
-            <button type="button" class="secondary" id="findOnMapBtn" data-i18n="find_on_map_btn">Найти на карте</button>
-        </div>
+    <div class="page">
+        <h1 data-i18n="edit_listing_title">Редактировать объявление</h1>
 
-        <div>
-            <label data-i18n="map_location_edit_label">Местоположение на карте (кликните, чтобы изменить точку)</label>
-            <div id="mapPicker" style="height: 300px; border: 1px solid var(--line); border-radius: var(--radius);"></div>
-            <input type="hidden" id="latitude">
-            <input type="hidden" id="longitude">
-        </div>
+        <form id="listingForm">
+            <div><label data-i18n="name_label">Название:</label><input type="text" id="apartmentName" required></div>
+            <div><label data-i18n="description_label">Описание:</label><textarea id="description"></textarea></div>
+            <div><label data-i18n="country_label">Страна:</label>
+                <select id="country" required>
+                    <option value="DE" data-i18n="germany_option">Германия</option>
+                </select>
+            </div>
 
-        <div><label data-i18n="property_type_label">Тип жилья:</label>
-            <select id="propertyType">
-                <option value="apartment" data-i18n="type_apartment">Квартира</option>
-                <option value="house" data-i18n="type_house">Дом</option>
-                <option value="studio" data-i18n="type_studio">Студия</option>
-            </select>
-        </div>
+            <div>
+                <label data-i18n="address_label">Адрес:</label>
+                <input type="text" id="address" required>
+                <button type="button" class="secondary" id="findOnMapBtn" data-i18n="find_on_map_btn">Найти на карте</button>
+            </div>
 
-        <div id="floorField"><label data-i18n="floor_label">Этаж:</label><input type="number" id="floor" min="1"></div>
-        <div id="floorsCountField" style="display: none;"><label data-i18n="floors_count_label">Количество этажей:</label><input type="number" id="floorsCount" min="1"></div>
+            <div>
+                <label data-i18n="map_location_edit_label">Местоположение на карте (кликните, чтобы изменить точку)</label>
+                <div id="mapPicker" style="height: 300px; border: 1px solid var(--line); border-radius: var(--radius);"></div>
+                <input type="hidden" id="latitude">
+                <input type="hidden" id="longitude">
+            </div>
 
-        <div id="roomsSection">
-            <div><label data-i18n="room_count_label">Количество комнат:</label><input type="number" id="roomCount" min="1" required></div>
-            <div><label data-i18n="shower_count_label">Количество ванных:</label><input type="number" id="showerCount" min="1" required></div>
-            <div><label data-i18n="toilets_count_label">Количество туалетов:</label><input type="number" id="toiletsCount" min="1" required></div>
-        </div>
+            <div><label data-i18n="property_type_label">Тип жилья:</label>
+                <select id="propertyType">
+                    <option value="apartment" data-i18n="type_apartment">Квартира</option>
+                    <option value="house" data-i18n="type_house">Дом</option>
+                    <option value="studio" data-i18n="type_studio">Студия</option>
+                </select>
+            </div>
 
-        <div><label data-i18n="max_guests_label">Макс. гостей:</label><input type="number" id="maxGuests" min="1" required></div>
-        <div><label data-i18n="input_type_label">Как попасть внутрь:</label>
-            <select id="inputType">
-                <option value="key" data-i18n="input_key">Ключ</option>
-                <option value="pin_kode" data-i18n="input_pin">Пин-код</option>
-                <option value="card" data-i18n="input_card">Карта</option>
-            </select>
-        </div>
-        <div><label data-i18n="price_per_night_label">Цена за сутки (€):</label><input type="number" id="pricePerNight" step="0.01" min="0.01" required></div>
+            <div id="floorField"><label data-i18n="floor_label">Этаж:</label><input type="number" id="floor" min="1"></div>
+            <div id="floorsCountField" style="display: none;"><label data-i18n="floors_count_label">Количество этажей:</label><input type="number" id="floorsCount" min="1"></div>
 
-        <div><label><input type="checkbox" id="parking"> <span data-i18n="parking_label">Парковка</span></label></div>
-        <div><label><input type="checkbox" id="wifi"> Wi-Fi</label></div>
-        <div><label><input type="checkbox" id="canSmoke"> <span data-i18n="smoke_label">Можно курить</span></label></div>
-        <div><label><input type="checkbox" id="canPets"> <span data-i18n="pets_label">Можно с питомцами</span></label></div>
-        <div><label><input type="checkbox" id="indoorFireplace"> <span data-i18n="fireplace_label">Камин</span></label></div>
-        <div><label><input type="checkbox" id="airConditioner"> <span data-i18n="ac_label">Кондиционер</span></label></div>
-        <div><label><input type="checkbox" id="elevator"> <span data-i18n="elevator_label">Лифт</span></label></div>
-        <div><label><input type="checkbox" id="facilities"> <span data-i18n="disability_label">Доступно для людей с инвалидностью</span></label></div>
+            <div id="roomsSection">
+                <div><label data-i18n="room_count_label">Количество комнат:</label><input type="number" id="roomCount" min="1" required></div>
+                <div><label data-i18n="shower_count_label">Количество ванных:</label><input type="number" id="showerCount" min="1" required></div>
+                <div><label data-i18n="toilets_count_label">Количество туалетов:</label><input type="number" id="toiletsCount" min="1" required></div>
+            </div>
 
-        <button type="submit" data-i18n="save_changes_btn">Сохранить изменения</button>
-    </form>
+            <div><label data-i18n="max_guests_label">Макс. гостей:</label><input type="number" id="maxGuests" min="1" required></div>
+            <div><label data-i18n="input_type_label">Как попасть внутрь:</label>
+                <select id="inputType">
+                    <option value="key" data-i18n="input_key">Ключ</option>
+                    <option value="pin_kode" data-i18n="input_pin">Пин-код</option>
+                    <option value="card" data-i18n="input_card">Карта</option>
+                </select>
+            </div>
+            <div><label data-i18n="price_per_night_label">Цена за сутки (€):</label><input type="number" id="pricePerNight" step="0.01" min="0.01" required></div>
 
-    <h2 data-i18n="photos_title">Фото</h2>
-    <div id="photosContainer"></div>
+            <div><label><input type="checkbox" id="parking"> <span data-i18n="parking_label">Парковка</span></label></div>
+            <div><label><input type="checkbox" id="wifi"> Wi-Fi</label></div>
+            <div><label><input type="checkbox" id="canSmoke"> <span data-i18n="smoke_label">Можно курить</span></label></div>
+            <div><label><input type="checkbox" id="canPets"> <span data-i18n="pets_label">Можно с питомцами</span></label></div>
+            <div><label><input type="checkbox" id="indoorFireplace"> <span data-i18n="fireplace_label">Камин</span></label></div>
+            <div><label><input type="checkbox" id="airConditioner"> <span data-i18n="ac_label">Кондиционер</span></label></div>
+            <div><label><input type="checkbox" id="elevator"> <span data-i18n="elevator_label">Лифт</span></label></div>
+            <div><label><input type="checkbox" id="facilities"> <span data-i18n="disability_label">Доступно для людей с инвалидностью</span></label></div>
 
-    <h3 data-i18n="add_new_photo_title">Добавить новое фото</h3>
-    <input type="file" id="photoInput" accept="image/*" multiple>
-    <button id="uploadPhotosBtn" type="button" data-i18n="upload_btn">Загрузить</button>
-    <p id="photoMessage"></p>
+            <button type="submit" data-i18n="save_changes_btn">Сохранить изменения</button>
+        </form>
 
-    <p id="message"></p>
+        <h2 data-i18n="photos_title">Фото</h2>
+        <div id="photosContainer"></div>
+
+        <h3 data-i18n="add_new_photo_title">Добавить новое фото</h3>
+        <input type="file" id="photoInput" accept="image/*" multiple>
+        <button id="uploadPhotosBtn" type="button" data-i18n="upload_btn">Загрузить</button>
+        <p id="photoMessage"></p>
+
+        <p id="message"></p>
+    </div>
 
     <script src="js/api.js"></script>
     <script src="js/i18n.js"></script>
@@ -313,9 +332,9 @@
                 floor: document.getElementById('floor').value ? parseInt(document.getElementById('floor').value) : null,
                 floors_count: document.getElementById('floorsCount').value ? parseInt(document.getElementById('floorsCount').value) : null,
                 property_type: document.getElementById('propertyType').value,
-                room_count: parseInt(document.getElementById('roomCount').value),
-                shower_count: parseInt(document.getElementById('showerCount').value),
-                toilets_count: parseInt(document.getElementById('toiletsCount').value),
+                room_count: parseInt(document.getElementById('roomCount').value) || 1,
+                shower_count: parseInt(document.getElementById('showerCount').value) || 1,
+                toilets_count: parseInt(document.getElementById('toiletsCount').value) || 1,
                 max_guests: parseInt(document.getElementById('maxGuests').value),
                 input_type: document.getElementById('inputType').value,
                 price_per_night: document.getElementById('pricePerNight').value,

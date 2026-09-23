@@ -139,3 +139,23 @@ async function handleResponse(response) {
     if (response.status === 204) return null;
     return response.json();
 }
+
+
+function initLightbox() {
+    if (document.getElementById('lightboxOverlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'lightboxOverlay';
+    overlay.className = 'lightbox-overlay';
+    overlay.innerHTML = '<img id="lightboxImg" src="">';
+    overlay.addEventListener('click', function () {
+        overlay.classList.remove('open');
+    });
+    document.body.appendChild(overlay);
+}
+
+function openLightbox(src) {
+    initLightbox();
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightboxOverlay').classList.add('open');
+}

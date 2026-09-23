@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/style.css">
-    <title>Объявление</title>
+    <title>StayHome — Объявление</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
-    <div style="text-align: right; padding: 0.5rem 1rem;">
-        <select id="languageSelect" onchange="setLanguage(this.value)">
+    <div class="utility-bar">
+        <select id="languageSelect" class="lang-select" onchange="setLanguage(this.value)">
             <option value="ru">RU</option>
             <option value="en">EN</option>
             <option value="de">DE</option>
@@ -17,62 +17,80 @@
         </select>
     </div>
 
-    <p><a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a></p>
+    <nav class="site-nav">
+        <a href="index.html" class="brand">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 11L12 4L21 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 10V19C5 19.5523 5.44772 20 6 20H9V15C9 14.4477 9.44772 14 10 14H14C14.5523 14 15 14.4477 15 15V20H18C18.5523 20 19 19.5523 19 19V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            StayHome
+        </a>
+        <div class="links">
+            <a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a>
+            <a href="listing-create.html" data-i18n="nav_create">Создать объявление</a>
+            <a href="my-listings.html" data-i18n="nav_my_listings">Мои объявления</a>
+            <a href="my-bookings.html" data-i18n="nav_my_bookings">Мои брони</a>
+            <a href="favorites.html" data-i18n="nav_favorites">Избранное</a>
+            <a href="profile.html" data-i18n="nav_profile">Профиль</a>
+        </div>
+    </nav>
 
-    <div id="listingContainer" data-i18n="loading">Загрузка...</div>
+    <div class="page">
+        <div id="listingContainer" data-i18n="loading">Загрузка...</div>
 
-    <div id="mapContainer" style="height: 300px; margin: 1rem 0; display: none;"></div>
+        <div id="mapContainer" style="height: 300px; margin: 1rem 0; display: none;"></div>
 
-    <hr>
+        <hr>
 
-    <div id="bookingSection" style="display: none;">
-        <h2 data-i18n="book_now_title">Забронировать</h2>
-        <form id="bookingForm">
-            <div>
-                <label data-i18n="dates_label">Даты:</label>
-                <input type="text" id="dateRange" placeholder="Выберите даты" readonly>
-            </div>
-            <div>
-                <label data-i18n="guests_count_label">Количество гостей:</label>
-                <input type="number" id="guestsCount" min="1" value="1" required>
-            </div>
-            <button type="submit" data-i18n="book_btn">Забронировать</button>
-        </form>
-        <p id="bookingMessage"></p>
-    </div>
+        <div id="bookingSection" style="display: none;">
+            <h2 data-i18n="book_now_title">Забронировать</h2>
+            <form id="bookingForm">
+                <div>
+                    <label data-i18n="dates_label">Даты:</label>
+                    <input type="text" id="dateRange" placeholder="Выберите даты" readonly>
+                </div>
+                <div>
+                    <label data-i18n="guests_count_label">Количество гостей:</label>
+                    <input type="number" id="guestsCount" min="1" value="1" required>
+                </div>
+                <button type="submit" data-i18n="book_btn">Забронировать</button>
+            </form>
+            <p id="bookingMessage"></p>
+        </div>
 
-    <p id="loginPrompt" style="display: none;">
-        <a href="login.html" data-i18n="login_link">Войдите</a>, <span data-i18n="need_login_book_suffix">чтобы забронировать это жильё.</span>
-    </p>
+        <p id="loginPrompt" style="display: none;">
+            <a href="login.html" data-i18n="login_link">Войдите</a>, <span data-i18n="need_login_book_suffix">чтобы забронировать это жильё.</span>
+        </p>
 
-    <hr>
-    <h2 data-i18n="reviews_title">Отзывы</h2>
-    <div id="reviewsContainer" data-i18n="loading">Загрузка...</div>
+        <hr>
+        <h2 data-i18n="reviews_title">Отзывы</h2>
+        <div id="reviewsContainer" data-i18n="loading">Загрузка...</div>
 
-    <div id="reviewFormSection" style="display: none;">
-        <h3 data-i18n="leave_review_title">Оставить отзыв</h3>
-        <form id="reviewForm">
-            <div>
-                <label data-i18n="booking_label">Бронь:</label>
-                <select id="reviewBookingSelect"></select>
-            </div>
-            <div>
-                <label data-i18n="rating_label">Оценка:</label>
-                <select id="reviewStars">
-                    <option value="5" data-i18n="rating_5">5 - отлично</option>
-                    <option value="4" data-i18n="rating_4">4 - хорошо</option>
-                    <option value="3" data-i18n="rating_3">3 - нормально</option>
-                    <option value="2" data-i18n="rating_2">2 - плохо</option>
-                    <option value="1" data-i18n="rating_1">1 - ужасно</option>
-                </select>
-            </div>
-            <div>
-                <label data-i18n="comment_label">Комментарий:</label>
-                <textarea id="reviewComment" required minlength="10"></textarea>
-            </div>
-            <button type="submit" data-i18n="submit_review_btn">Отправить отзыв</button>
-        </form>
-        <p id="reviewMessage"></p>
+        <div id="reviewFormSection" style="display: none;">
+            <h3 data-i18n="leave_review_title">Оставить отзыв</h3>
+            <form id="reviewForm">
+                <div>
+                    <label data-i18n="booking_label">Бронь:</label>
+                    <select id="reviewBookingSelect"></select>
+                </div>
+                <div>
+                    <label data-i18n="rating_label">Оценка:</label>
+                    <select id="reviewStars">
+                        <option value="5" data-i18n="rating_5">5 - отлично</option>
+                        <option value="4" data-i18n="rating_4">4 - хорошо</option>
+                        <option value="3" data-i18n="rating_3">3 - нормально</option>
+                        <option value="2" data-i18n="rating_2">2 - плохо</option>
+                        <option value="1" data-i18n="rating_1">1 - ужасно</option>
+                    </select>
+                </div>
+                <div>
+                    <label data-i18n="comment_label">Комментарий:</label>
+                    <textarea id="reviewComment" required minlength="10"></textarea>
+                </div>
+                <button type="submit" data-i18n="submit_review_btn">Отправить отзыв</button>
+            </form>
+            <p id="reviewMessage"></p>
+        </div>
     </div>
 
     <script src="js/api.js"></script>
@@ -117,7 +135,7 @@
                     const ownerNotice = document.createElement('p');
                     ownerNotice.textContent = t('own_listing_notice');
                     ownerNotice.style.color = 'gray';
-                    document.body.insertBefore(ownerNotice, bookingSection);
+                    document.querySelector('.page').insertBefore(ownerNotice, bookingSection);
                 }
             } catch (err) {
                 console.error('Не удалось проверить владельца:', err);
@@ -125,25 +143,60 @@
         }
 
         function renderListing(listing) {
-            listingOwnerId = listing.owner;
+    listingOwnerId = listing.owner;
 
-            const photosHtml = (listing.photos || [])
-                .map(p => `<img src="${p.image}" width="200" style="margin-right: 5px;">`)
-                .join('');
+    const photosHtml = (listing.photos || [])
+        .map(p => `<img src="${p.image}" width="200" style="margin-right: 5px;" class="listing-detail-photo" onclick="openLightbox('${p.image}')">`)
+        .join('');
 
-            listingContainer.innerHTML = `
-                <h1>${listing.apartment_name}</h1>
-                <div>${photosHtml || `<p>${t('no_photos')}</p>`}</div>
-                <p>${listing.country}, ${listing.address}</p>
-                <p>${t('guests_up_to')} ${listing.max_guests} ${t('guests_word')}</p>
-                <p><strong>${listing.price_per_night} €</strong> ${t('per_night')}</p>
-                <p>${t('host_label')}: <a href="user-profile.html?id=${listing.owner}">${listing.owner_username}</a></p>
-            `;
+    const propertyTypeLabels = { apartment: t('type_apartment'), house: t('type_house'), studio: t('type_studio') };
+    const inputTypeLabels = { key: t('input_key'), pin_kode: t('input_pin'), card: t('input_card') };
 
-            if (listing.latitude && listing.longitude) {
-                showMap(parseFloat(listing.latitude), parseFloat(listing.longitude), listing.apartment_name);
-            }
-        }
+    const floorLine = listing.property_type === 'house'
+        ? `<p>${t('floors_count_label')} ${listing.floors_count}</p>`
+        : `<p>${t('floor_label')} ${listing.floor}</p>`;
+
+    const amenities = [
+        listing.parking ? t('parking_label') : null,
+        listing.wifi ? 'Wi-Fi' : null,
+        listing.can_smoke ? t('smoke_label') : null,
+        listing.can_pets ? t('pets_label') : null,
+        listing.indoor_fireplace ? t('fireplace_label') : null,
+        listing.air_conditioner ? t('ac_label') : null,
+        listing.elevator ? t('elevator_label') : null,
+        listing.facilities_for_guests_with_disabilities ? t('disability_label') : null,
+    ].filter(Boolean);
+
+    const amenitiesHtml = amenities.length
+        ? `<div class="promo-badges">${amenities.map(a => `<span>✓ ${a}</span>`).join('')}</div>`
+        : '';
+
+    listingContainer.innerHTML = `
+        <h1>${listing.apartment_name}</h1>
+        <div>${photosHtml || `<p>${t('no_photos')}</p>`}</div>
+        <p class="muted">${propertyTypeLabels[listing.property_type] || listing.property_type}</p>
+        <p>${listing.country}, ${listing.address}</p>
+        ${listing.description ? `<p>${listing.description}</p>` : ''}
+
+        <div class="panel">
+            <p>${t('guests_up_to')} ${listing.max_guests} ${t('guests_word')}</p>
+            <p>${t('room_count_label')} ${listing.room_count}</p>
+            <p>${t('shower_count_label')} ${listing.shower_count}</p>
+            <p>${t('toilets_count_label')} ${listing.toilets_count}</p>
+            ${floorLine}
+            <p>${t('input_type_label')} ${inputTypeLabels[listing.input_type] || listing.input_type}</p>
+        </div>
+
+        ${amenitiesHtml}
+
+        <p><strong>${listing.price_per_night} €</strong> ${t('per_night')}</p>
+        <p>${t('host_label')}: <a href="user-profile.html?id=${listing.owner}">${listing.owner_username}</a></p>
+    `;
+
+    if (listing.latitude && listing.longitude) {
+        showMap(parseFloat(listing.latitude), parseFloat(listing.longitude), listing.apartment_name);
+    }
+}
 
         function showMap(lat, lon, title) {
             const mapContainer = document.getElementById('mapContainer');

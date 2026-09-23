@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/style.css">
-    <title>Регистрация</title>
+    <title>StayHome — Регистрация</title>
 </head>
 <body>
-    <div style="text-align: right; padding: 0.5rem 1rem;">
-        <select id="languageSelect" onchange="setLanguage(this.value)">
+    <div class="utility-bar">
+        <select id="languageSelect" class="lang-select" onchange="setLanguage(this.value)">
             <option value="ru">RU</option>
             <option value="en">EN</option>
             <option value="de">DE</option>
@@ -15,38 +15,54 @@
         </select>
     </div>
 
-    <h1 data-i18n="register_title">Регистрация</h1>
+    <nav class="site-nav">
+        <a href="index.html" class="brand">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 11L12 4L21 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 10V19C5 19.5523 5.44772 20 6 20H9V15C9 14.4477 9.44772 14 10 14H14C14.5523 14 15 14.4477 15 15V20H18C18.5523 20 19 19.5523 19 19V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            StayHome
+        </a>
+        <div class="links">
+            <a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a>
+            <a href="login.html" data-i18n="nav_login">Войти</a>
+        </div>
+    </nav>
 
-    <form id="registerForm">
-        <div>
-            <label data-i18n="username_label">Имя пользователя:</label>
-            <input type="text" id="username" required>
-        </div>
-        <div>
-            <label data-i18n="email_label">Email:</label>
-            <input type="email" id="email" required>
-        </div>
-        <div>
-            <label data-i18n="password_label">Пароль:</label>
-            <input type="password" id="password" required>
-        </div>
-        <div>
-            <label data-i18n="password_confirm_label">Повторите пароль:</label>
-            <input type="password" id="passwordConfirm" required>
-        </div>
-        <div>
-            <label data-i18n="birth_date_label">Дата рождения:</label>
-            <input type="date" id="birthDate">
-        </div>
-        <div>
-            <label data-i18n="phone_label">Телефон:</label>
-            <input type="tel" id="phone">
-        </div>
-        <button type="submit" data-i18n="register_btn">Зарегистрироваться</button>
-    </form>
+    <div class="page">
+        <h1 data-i18n="register_title">Регистрация</h1>
 
-    <p id="errorMessage" style="color: red;"></p>
-    <p><a href="login.html" data-i18n="have_account">Уже есть аккаунт? Войти</a></p>
+        <form id="registerForm">
+            <div>
+                <label data-i18n="username_label">Имя пользователя:</label>
+                <input type="text" id="username" required>
+            </div>
+            <div>
+                <label data-i18n="email_label">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            <div>
+                <label data-i18n="password_label">Пароль:</label>
+                <input type="password" id="password" required>
+            </div>
+            <div>
+                <label data-i18n="password_confirm_label">Повторите пароль:</label>
+                <input type="password" id="passwordConfirm" required>
+            </div>
+            <div>
+                <label data-i18n="birth_date_label">Дата рождения:</label>
+                <input type="date" id="birthDate">
+            </div>
+            <div>
+                <label data-i18n="phone_label">Телефон:</label>
+                <input type="tel" id="phone">
+            </div>
+            <button type="submit" data-i18n="register_btn">Зарегистрироваться</button>
+        </form>
+
+        <p id="errorMessage" style="color: red;"></p>
+        <p><a href="login.html" data-i18n="have_account">Уже есть аккаунт? Войти</a></p>
+    </div>
 
     <script src="js/api.js"></script>
     <script src="js/i18n.js"></script>

@@ -3,11 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/style.css">
-    <title>Каталог объявлений</title>
+    <title>StayHome — Каталог объявлений</title>
 </head>
 <body>
+    <div class="utility-bar">
+        <select id="languageSelect" class="lang-select" onchange="setLanguage(this.value)">
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+            <option value="uk">UA</option>
+        </select>
+    </div>
+
     <nav class="site-nav">
-        <a href="index.html" class="brand">Nestwell</a>
+        <a href="index.html" class="brand">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 11L12 4L21 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 10V19C5 19.5523 5.44772 20 6 20H9V15C9 14.4477 9.44772 14 10 14H14C14.5523 14 15 14.4477 15 15V20H18C18.5523 20 19 19.5523 19 19V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            StayHome
+        </a>
         <div class="links">
             <a href="login.html" id="navLogin" data-i18n="nav_login">Войти</a>
             <a href="register.html" id="navRegister" data-i18n="nav_register">Регистрация</a>
@@ -17,16 +32,22 @@
             <a href="favorites.html" data-i18n="nav_favorites">Избранное</a>
             <a href="profile.html" data-i18n="nav_profile">Профиль</a>
             <button id="logoutBtn" style="display: none;" data-i18n="nav_logout">Выйти</button>
-            <select id="languageSelect" onchange="setLanguage(this.value)">
-                <option value="ru">RU</option>
-                <option value="en">EN</option>
-                <option value="de">DE</option>
-                <option value="uk">UA</option>
-            </select>
         </div>
     </nav>
 
     <div class="page">
+        <div class="promo-strip">
+            <div class="promo-card">
+                <h2>Не дом, но почти.</h2>
+                <p>Тысячи проверенных квартир для аренды на пару ночей или на месяцы вперёд — заезжайте и живите как у себя.</p>
+                <div class="promo-badges">
+                    <span>✓ Хозяева проверены</span>
+                    <span>✓ Бесплатная отмена</span>
+                    <span>✓ Заселение сегодня</span>
+                </div>
+            </div>
+        </div>
+
         <h1 data-i18n="catalog_title">Все объявления</h1>
 
         <form id="filterForm" class="form-grid" style="max-width: none; margin-bottom: 1.5rem;">
@@ -56,7 +77,7 @@
             </div>
         </form>
 
-        <div id="listingsContainer" data-i18n="loading">Загрузка...</div>
+        <div id="listingsContainer">Загрузка...</div>
     </div>
 
     <script src="js/api.js"></script>
@@ -80,19 +101,14 @@
 
         function buildQuery() {
             const params = new URLSearchParams();
-
             const search = document.getElementById('searchInput').value.trim();
             if (search) params.set('search', search);
-
             const ordering = document.getElementById('orderingSelect').value;
             if (ordering) params.set('ordering', ordering);
-
             const minPrice = document.getElementById('minPriceInput').value;
             if (minPrice) params.set('min_price', minPrice);
-
             const maxPrice = document.getElementById('maxPriceInput').value;
             if (maxPrice) params.set('max_price', maxPrice);
-
             const query = params.toString();
             return query ? `?${query}` : '';
         }
@@ -101,9 +117,7 @@
             try {
                 const favorites = await apiGet('/listings/favorites/');
                 const map = new Map();
-                favorites.forEach(function (fav) {
-                    map.set(fav.listing, fav.id);
-                });
+                favorites.forEach(function (fav) { map.set(fav.listing, fav.id); });
                 return map;
             } catch (err) {
                 return new Map();
@@ -135,10 +149,7 @@
             grid.className = 'listing-grid';
 
             listings.forEach(function (listing) {
-                const photoUrl = listing.photos && listing.photos.length > 0
-                    ? listing.photos[0].image
-                    : null;
-
+                const photoUrl = listing.photos && listing.photos.length > 0 ? listing.photos[0].image : null;
                 const isFavorite = favoriteIds.has(listing.id);
                 const isOwnListing = currentUserId === listing.owner;
 

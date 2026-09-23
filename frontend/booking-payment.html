@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/style.css">
-    <title>Оплата брони</title>
+    <title>StayHome — Оплата брони</title>
 </head>
 <body>
-    <div style="text-align: right; padding: 0.5rem 1rem;">
-        <select id="languageSelect" onchange="setLanguage(this.value)">
+    <div class="utility-bar">
+        <select id="languageSelect" class="lang-select" onchange="setLanguage(this.value)">
             <option value="ru">RU</option>
             <option value="en">EN</option>
             <option value="de">DE</option>
@@ -15,32 +15,50 @@
         </select>
     </div>
 
-    <p><a href="my-bookings.html" data-i18n="back_to_my_bookings">← Назад к моим броням</a></p>
-    <h1 data-i18n="payment_title">Оплата бронирования</h1>
+    <nav class="site-nav">
+        <a href="index.html" class="brand">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 11L12 4L21 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 10V19C5 19.5523 5.44772 20 6 20H9V15C9 14.4477 9.44772 14 10 14H14C14.5523 14 15 14.4477 15 15V20H18C18.5523 20 19 19.5523 19 19V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            StayHome
+        </a>
+        <div class="links">
+            <a href="my-bookings.html" data-i18n="back_to_my_bookings">← Назад к моим броням</a>
+            <a href="listing-create.html" data-i18n="nav_create">Создать объявление</a>
+            <a href="my-listings.html" data-i18n="nav_my_listings">Мои объявления</a>
+            <a href="favorites.html" data-i18n="nav_favorites">Избранное</a>
+            <a href="profile.html" data-i18n="nav_profile">Профиль</a>
+        </div>
+    </nav>
 
-    <div id="bookingSummary" data-i18n="loading">Загрузка...</div>
+    <div class="page">
+        <h1 data-i18n="payment_title">Оплата бронирования</h1>
 
-    <form id="paymentForm">
-        <div>
-            <label data-i18n="cardholder_label">Имя и фамилия владельца карты</label>
-            <input type="text" id="cardholderName" required>
-        </div>
-        <div>
-            <label data-i18n="card_number_label">Номер карты</label>
-            <input type="text" id="cardNumber" placeholder="4111 1111 1111 1111" required maxlength="19">
-        </div>
-        <div>
-            <label data-i18n="expiry_label">Срок действия (MM/YY)</label>
-            <input type="text" id="expiryDate" placeholder="12/28" required maxlength="5">
-        </div>
-        <div>
-            <label data-i18n="cvv_label">CVV</label>
-            <input type="text" id="cvv" placeholder="123" required maxlength="4">
-        </div>
-        <button type="submit" data-i18n="pay_now_btn">Оплатить</button>
-    </form>
+        <div id="bookingSummary" data-i18n="loading">Загрузка...</div>
 
-    <p id="paymentMessage"></p>
+        <form id="paymentForm">
+            <div>
+                <label data-i18n="cardholder_label">Имя и фамилия владельца карты</label>
+                <input type="text" id="cardholderName" required>
+            </div>
+            <div>
+                <label data-i18n="card_number_label">Номер карты</label>
+                <input type="text" id="cardNumber" placeholder="4111 1111 1111 1111" required maxlength="19">
+            </div>
+            <div>
+                <label data-i18n="expiry_label">Срок действия (MM/YY)</label>
+                <input type="text" id="expiryDate" placeholder="12/28" required maxlength="5">
+            </div>
+            <div>
+                <label data-i18n="cvv_label">CVV</label>
+                <input type="text" id="cvv" placeholder="123" required maxlength="4">
+            </div>
+            <button type="submit" data-i18n="pay_now_btn">Оплатить</button>
+        </form>
+
+        <p id="paymentMessage"></p>
+    </div>
 
     <script src="js/api.js"></script>
     <script src="js/i18n.js"></script>

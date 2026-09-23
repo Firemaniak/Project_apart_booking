@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/style.css">
-    <title>Вход</title>
+    <title>StayHome — Вход</title>
 </head>
 <body>
-    <div style="text-align: right; padding: 0.5rem 1rem;">
-        <select id="languageSelect" onchange="setLanguage(this.value)">
+    <div class="utility-bar">
+        <select id="languageSelect" class="lang-select" onchange="setLanguage(this.value)">
             <option value="ru">RU</option>
             <option value="en">EN</option>
             <option value="de">DE</option>
@@ -15,21 +15,37 @@
         </select>
     </div>
 
-    <h1 data-i18n="login_title">Вход в аккаунт</h1>
-
-    <form id="loginForm">
-        <div>
-            <label data-i18n="email_label">Email:</label>
-            <input type="email" id="email" required>
+    <nav class="site-nav">
+        <a href="index.html" class="brand">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 11L12 4L21 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 10V19C5 19.5523 5.44772 20 6 20H9V15C9 14.4477 9.44772 14 10 14H14C14.5523 14 15 14.4477 15 15V20H18C18.5523 20 19 19.5523 19 19V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            StayHome
+        </a>
+        <div class="links">
+            <a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a>
+            <a href="register.html" data-i18n="nav_register">Регистрация</a>
         </div>
-        <div>
-            <label data-i18n="password_label">Пароль:</label>
-            <input type="password" id="password" required>
-        </div>
-        <button type="submit" data-i18n="login_btn">Войти</button>
-    </form>
+    </nav>
 
-    <p id="errorMessage" style="color: red;"></p>
+    <div class="page">
+        <h1 data-i18n="login_title">Вход в аккаунт</h1>
+
+        <form id="loginForm">
+            <div>
+                <label data-i18n="email_label">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            <div>
+                <label data-i18n="password_label">Пароль:</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" data-i18n="login_btn">Войти</button>
+        </form>
+
+        <p id="errorMessage" style="color: red;"></p>
+    </div>
 
     <script src="js/api.js"></script>
     <script src="js/i18n.js"></script>

@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/style.css">
-    <title>Профиль пользователя</title>
+    <title>StayHome — Профиль пользователя</title>
 </head>
 <body>
-    <div style="text-align: right; padding: 0.5rem 1rem;">
-        <select id="languageSelect" onchange="setLanguage(this.value)">
+    <div class="utility-bar">
+        <select id="languageSelect" class="lang-select" onchange="setLanguage(this.value)">
             <option value="ru">RU</option>
             <option value="en">EN</option>
             <option value="de">DE</option>
@@ -15,11 +15,30 @@
         </select>
     </div>
 
-    <p><a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a></p>
-    <div id="userContainer" data-i18n="loading">Загрузка...</div>
+    <nav class="site-nav">
+        <a href="index.html" class="brand">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 11L12 4L21 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 10V19C5 19.5523 5.44772 20 6 20H9V15C9 14.4477 9.44772 14 10 14H14C14.5523 14 15 14.4477 15 15V20H18C18.5523 20 19 19.5523 19 19V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            StayHome
+        </a>
+        <div class="links">
+            <a href="index.html" data-i18n="back_to_catalog">← Назад к каталогу</a>
+            <a href="listing-create.html" data-i18n="nav_create">Создать объявление</a>
+            <a href="my-listings.html" data-i18n="nav_my_listings">Мои объявления</a>
+            <a href="my-bookings.html" data-i18n="nav_my_bookings">Мои брони</a>
+            <a href="favorites.html" data-i18n="nav_favorites">Избранное</a>
+            <a href="profile.html" data-i18n="nav_profile">Профиль</a>
+        </div>
+    </nav>
 
-    <h2 data-i18n="host_stats_title">Статистика как хозяин</h2>
-    <div id="statsContainer"></div>
+    <div class="page">
+        <div id="userContainer" data-i18n="loading">Загрузка...</div>
+
+        <h2 data-i18n="host_stats_title">Статистика как хозяин</h2>
+        <div id="statsContainer"></div>
+    </div>
 
     <script src="js/api.js"></script>
     <script src="js/i18n.js"></script>
